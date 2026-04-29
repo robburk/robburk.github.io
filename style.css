@@ -771,3 +771,21 @@ footer {
     grid-template-columns: 1fr;
   }
 }
+
+/* ─── MINIMAL SERVICE ITEMS (homepage) ───────────────────── */
+.service-item--minimal {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: opacity 0.2s;
+}
+
+.service-item--minimal h3 {
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.service-item--minimal:hover { opacity: 0.5; }
+
+.service-item--minimal p { display: none; }
