@@ -136,12 +136,9 @@ main { padding-top: 61px; }
   font-size: 0.72rem;
   font-weight: 500;
   letter-spacing: 0.14em;
-  transition: background 0.2s, color 0.2s;
   align-self: flex-start;
 }
 
-[data-theme="light"] .cta:hover { background: var(--black); color: var(--white); }
-[data-theme="dark"]  .cta:hover { background: var(--white); color: var(--black); }
 
 /* ─── MARQUEE ───────────────────────────────────────── */
 .marquee-bar {
@@ -475,7 +472,6 @@ footer {
   letter-spacing: 0.14em;
   cursor: pointer;
   color: inherit;
-  transition: background 0.2s, color 0.2s;
 }
 
 [data-theme="light"] .form-submit:hover { background: var(--black); color: var(--white); }
@@ -1076,4 +1072,48 @@ nav ul li a::after {
 
 nav ul li a:hover::after {
   width: 100%;
+}
+
+/* ─── CTA BUTTON FILL (left to right) ───────────────────── */
+.cta {
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
+  transition: color 0.35s ease;
+}
+
+.cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  transform: translateX(-101%);
+  transition: transform 0.35s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+[data-theme="light"] .cta::before { background: var(--black); }
+[data-theme="dark"]  .cta::before { background: var(--white); }
+
+.cta:hover::before { transform: translateX(0); }
+
+[data-theme="light"] .cta:hover { background: transparent; color: var(--white); }
+[data-theme="dark"]  .cta:hover { background: transparent; color: var(--black); }
+
+/* ─── SCROLL PROGRESS LINE ───────────────────────────────── */
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 1px;
+  width: 0%;
+  z-index: 99999;
+  transition: width 0.05s linear;
+}
+
+[data-theme="light"] #scroll-progress { background: var(--black); }
+[data-theme="dark"]  #scroll-progress { background: var(--white); }
+
+/* ─── MARQUEE PAUSE/REVERSE ON HOVER ─────────────────────── */
+.marquee-bar:hover .marquee-track {
+  animation-play-state: paused;
 }

@@ -140,3 +140,16 @@ document.addEventListener('DOMContentLoaded', () => {
     animateTitle(document.querySelector('.page-title'), 0.45);
   }, 100);
 });
+
+// ── SCROLL PROGRESS LINE ──────────────────────────────────
+(function() {
+  const bar = document.createElement('div');
+  bar.id = 'scroll-progress';
+  document.body.appendChild(bar);
+
+  window.addEventListener('scroll', () => {
+    const doc = document.documentElement;
+    const scrolled = doc.scrollTop / (doc.scrollHeight - doc.clientHeight);
+    bar.style.width = (scrolled * 100) + '%';
+  }, { passive: true });
+})();
