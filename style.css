@@ -16,11 +16,14 @@ body {
   font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.6;
-  transition: background 0.4s, color 0.4s;
+  background: inherit;
+  color: inherit;
+  min-height: 100vh;
 }
 
-body.light { background: var(--white); color: var(--black); }
-body.dark  { background: var(--black); color: var(--white); }
+html { transition: background 0.3s, color 0.3s; }
+[data-theme="light"] { background: var(--white); color: var(--black); }
+[data-theme="dark"]  { background: var(--black); color: var(--white); }
 
 a { text-decoration: none; color: inherit; }
 img { max-width: 100%; display: block; }
@@ -38,11 +41,11 @@ nav {
   background: inherit;
 }
 
-body.light nav { background: var(--white); }
-body.dark  nav { background: var(--black); }
+[data-theme="light"] nav { background: var(--white); }
+[data-theme="dark"]  nav { background: var(--black); }
 
 nav .logo img { height: 28px; width: auto; }
-body.dark nav .logo img { filter: invert(1); }
+[data-theme="dark"] nav .logo img { filter: invert(1); }
 
 nav ul { list-style: none; display: flex; gap: 2rem; }
 nav ul li a {
@@ -76,8 +79,8 @@ nav ul li a:hover { opacity: 1; }
   border-bottom: 1px solid currentColor;
 }
 
-body.light .mobile-menu { background: var(--white); }
-body.dark  .mobile-menu { background: var(--black); }
+[data-theme="light"] .mobile-menu { background: var(--white); }
+[data-theme="dark"]  .mobile-menu { background: var(--black); }
 
 .mobile-menu a {
   font-size: 0.75rem;
@@ -135,8 +138,8 @@ main { padding-top: 61px; }
   align-self: flex-start;
 }
 
-body.light .cta:hover { background: var(--black); color: var(--white); }
-body.dark  .cta:hover { background: var(--white); color: var(--black); }
+[data-theme="light"] .cta:hover { background: var(--black); color: var(--white); }
+[data-theme="dark"]  .cta:hover { background: var(--white); color: var(--black); }
 
 /* ─── MARQUEE ───────────────────────────────────────── */
 .marquee-bar {
@@ -449,7 +452,7 @@ footer {
 }
 
 .form-group select option { background: var(--white); color: var(--black); }
-body.dark .form-group select option { background: var(--black); color: var(--white); }
+[data-theme="dark"] .form-group select option { background: var(--black); color: var(--white); }
 
 .form-group textarea { resize: none; height: 120px; }
 
@@ -470,8 +473,8 @@ body.dark .form-group select option { background: var(--black); color: var(--whi
   transition: background 0.2s, color 0.2s;
 }
 
-body.light .form-submit:hover { background: var(--black); color: var(--white); }
-body.dark  .form-submit:hover { background: var(--white); color: var(--black); }
+[data-theme="light"] .form-submit:hover { background: var(--black); color: var(--white); }
+[data-theme="dark"]  .form-submit:hover { background: var(--white); color: var(--black); }
 
 /* ─── RESPONSIVE ────────────────────────────────────── */
 @media (max-width: 900px) {
