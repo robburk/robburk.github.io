@@ -519,8 +519,7 @@ footer {
     transition: width 0.18s ease, height 0.18s ease, margin 0.18s ease, opacity 0.18s ease;
   }
 
-  [data-theme="light"] #cursor-dot { background: var(--black); }
-  [data-theme="dark"]  #cursor-dot { background: var(--white); }
+  #cursor-dot { background: #ffffff; mix-blend-mode: difference; }
 
   #cursor-dot.cursor-grow {
     width: 36px; height: 36px;
