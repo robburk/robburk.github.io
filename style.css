@@ -663,3 +663,111 @@ footer {
   .services-preview { grid-template-columns: 1fr; }
   .footer-links { flex-direction: column; gap: 0.5rem; }
 }
+
+/* ─── SERVICES DETAIL PAGE ───────────────────────────────── */
+.services-detail {
+  border-top: 1px solid currentColor;
+}
+
+.svc-block {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  border-bottom: 1px solid currentColor;
+}
+
+.svc-left {
+  padding: 4rem 2.5rem;
+  border-right: 1px solid currentColor;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.svc-num {
+  font-family: var(--font-display);
+  font-size: 5rem;
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0.1;
+  display: block;
+  margin-bottom: 2rem;
+}
+
+.svc-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 2.5vw, 2.4rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0.04em;
+}
+
+.svc-right {
+  padding: 4rem 2.5rem;
+}
+
+.svc-problem {
+  font-size: 1.05rem;
+  font-weight: 400;
+  line-height: 1.75;
+  margin-bottom: 1.25rem;
+  opacity: 0.5;
+  font-style: italic;
+}
+
+.svc-right p {
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+
+.svc-includes {
+  list-style: none;
+  padding: 0;
+  margin: 2rem 0 0;
+  border-top: 1px solid currentColor;
+  padding-top: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 2rem;
+}
+
+.svc-includes li {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  font-weight: 500;
+  opacity: 0.5;
+  text-transform: uppercase;
+}
+
+.svc-includes li::before {
+  content: '— ';
+  opacity: 0.5;
+}
+
+@media (max-width: 900px) {
+  .svc-block {
+    grid-template-columns: 1fr;
+  }
+  .svc-left {
+    border-right: none;
+    border-bottom: 1px solid currentColor;
+    padding: 3rem 1.5rem 2rem;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 1.5rem;
+  }
+  .svc-num {
+    font-size: 3.5rem;
+    margin-bottom: 0;
+    opacity: 0.12;
+  }
+  .svc-title {
+    font-size: clamp(1.4rem, 5vw, 2rem);
+  }
+  .svc-right {
+    padding: 2rem 1.5rem 3rem;
+  }
+  .svc-includes {
+    grid-template-columns: 1fr;
+  }
+}
