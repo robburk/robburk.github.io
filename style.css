@@ -585,3 +585,81 @@ footer {
   .about-photo-section { padding: 0 1.5rem; }
   .about-photo { max-width: 100%; }
 }
+
+/* ─── HERO SIZE FIX ──────────────────────────────────────── */
+.hero-title {
+  font-size: clamp(2.8rem, 7.5vw, 7.5rem) !important;
+  letter-spacing: 0.04em !important;
+  line-height: 1 !important;
+}
+
+.page-title {
+  font-size: clamp(2.8rem, 7vw, 7rem) !important;
+  letter-spacing: 0.04em !important;
+}
+
+/* ─── ABOUT SPLIT LAYOUT ────────────────────────────────── */
+.about-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid currentColor;
+}
+
+.about-image {
+  border-right: 1px solid currentColor;
+}
+
+.about-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+  filter: grayscale(100%) contrast(1.1);
+  max-height: 600px;
+}
+
+.about-text {
+  padding: 4rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* ─── FOOTER LINKS ───────────────────────────────────────── */
+footer {
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.footer-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.footer-links a {
+  font-size: 0.72rem;
+  font-weight: 300;
+  opacity: 0.4;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.footer-links a:hover { opacity: 0.8; }
+
+/* ─── SERVICES GRID MOBILE FIX ───────────────────────────── */
+@media (max-width: 900px) {
+  .about-split { grid-template-columns: 1fr; }
+  .about-image { border-right: none; border-bottom: 1px solid currentColor; }
+  .about-photo { max-height: 400px; }
+  .about-text { padding: 3rem 1.5rem; }
+  .services-preview { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 600px) {
+  .hero-title { font-size: clamp(2.2rem, 10vw, 4rem) !important; }
+  .page-title { font-size: clamp(2.2rem, 9vw, 3.5rem) !important; }
+  .services-preview { grid-template-columns: 1fr; }
+  .footer-links { flex-direction: column; gap: 0.5rem; }
+}
