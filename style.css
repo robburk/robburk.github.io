@@ -658,7 +658,7 @@ footer {
 }
 
 @media (max-width: 600px) {
-  .hero-title { font-size: clamp(2.2rem, 10vw, 4rem) !important; }
+  .hero-title { font-size: clamp(2rem, 8.5vw, 4rem) !important; }
   .page-title { font-size: clamp(2.2rem, 9vw, 3.5rem) !important; }
   .services-preview { grid-template-columns: 1fr; }
   .footer-links { flex-direction: column; gap: 0.5rem; }
