@@ -80,7 +80,12 @@ document.addEventListener('pointerdown', e => {
 const parallaxEl = document.querySelector('.hero-title') || document.querySelector('.page-title');
 if (parallaxEl) {
   let ticking = false;
+  // Only apply parallax after a short delay so GSAP intro animation finishes first
+  let parallaxReady = false;
+  setTimeout(() => { parallaxReady = true; }, 1200);
+
   window.addEventListener('scroll', () => {
+    if (!parallaxReady) return;
     if (!ticking) {
       requestAnimationFrame(() => {
         const y = window.scrollY;
