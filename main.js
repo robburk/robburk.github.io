@@ -35,13 +35,11 @@ if (window.matchMedia('(hover: hover)').matches) {
 // ── TAP RIPPLE (mobile) ───────────────────────────────────
 document.addEventListener('pointerdown', e => {
   if (e.pointerType !== 'touch') return;
-
   const ripple = document.createElement('span');
   ripple.className = 'tap-ripple';
   ripple.style.left = e.clientX + 'px';
   ripple.style.top  = e.clientY + 'px';
   document.body.appendChild(ripple);
-
   ripple.addEventListener('animationend', () => ripple.remove());
 });
 
@@ -53,8 +51,8 @@ if (heroTitle) {
     if (!ticking) {
       requestAnimationFrame(() => {
         const y = window.scrollY;
-        heroTitle.style.transform = `translateY(${y * 0.18}px)`;
-        heroTitle.style.opacity = 1 - y * 0.002;
+        heroTitle.style.transform = `translateY(${y * 0.14}px)`;
+        heroTitle.style.opacity = Math.max(0.05, 1 - y * 0.003);
         ticking = false;
       });
       ticking = true;
