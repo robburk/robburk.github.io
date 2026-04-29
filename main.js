@@ -113,41 +113,30 @@ revealEls.forEach(el => {
 });
 
 // ── HERO TITLE ANIMATION (GSAP + SplitType) ───────────────
-// Runs after wipe retreats so timing feels cinematic
-window.addEventListener('load', () => {
-  if (typeof gsap === 'undefined' || typeof SplitType === 'undefined') return;
+function animateTitle(el, delay) {
+  if (!el || typeof gsap === 'undefined' || typeof SplitType === 'undefined') return;
 
-  const titleEl = document.querySelector('.hero-title');
-  if (!titleEl) return;
+  // Replace <br> with spaces so SplitType can split cleanly
+  el.innerHTML = el.innerHTML.replace(/<br\s*\/?>/gi, ' ');
 
-  // Split into words
-  const split = new SplitType(titleEl, { types: 'words' });
+  const split = new SplitType(el, { types: 'words' });
+  if (!split.words || split.words.length === 0) return;
 
-  // Set initial state — words invisible, shifted down slightly
-  gsap.set(split.words, { opacity: 0, y: 30 });
-
-  // Animate in after a short delay to let wipe finish retreating
+  gsap.set(split.words, { opacity: 0, y: 28 });
   gsap.to(split.words, {
     opacity: 1,
     y: 0,
-    duration: 0.7,
+    duration: 0.65,
     ease: 'power3.out',
-    stagger: 0.08,
-    delay: 0.5
+    stagger: 0.07,
+    delay: delay || 0.5
   });
+}
 
-  // Also animate page-title on inner pages
-  const pageTitleEl = document.querySelector('.page-title');
-  if (pageTitleEl) {
-    const pageSplit = new SplitType(pageTitleEl, { types: 'words' });
-    gsap.set(pageSplit.words, { opacity: 0, y: 30 });
-    gsap.to(pageSplit.words, {
-      opacity: 1,
-      y: 0,
-      duration: 0.7,
-      ease: 'power3.out',
-      stagger: 0.08,
-      delay: 0.5
-    });
-  }
+// Run after DOM + scripts ready
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    animateTitle(document.querySelector('.hero-title'), 0.45);
+    animateTitle(document.querySelector('.page-title'), 0.45);
+  }, 100);
 });
