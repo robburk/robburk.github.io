@@ -4,8 +4,8 @@
   --white: #FFFFFF;
   --gray: #E8E8E8;
   --midgray: #999;
-  --font-display: 'Bebas Neue', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'DM Sans', sans-serif;  /* keep for nav/body */
 }
 
 /* ─── RESET ─────────────────────────────────────────── */
@@ -15,7 +15,7 @@ html { scroll-behavior: smooth; }
 body {
   font-family: var(--font-body);
   font-size: 16px;
-  line-height: 1.6;
+  line-height: 1.75;
   background: inherit;
   color: inherit;
   min-height: 100vh;
@@ -103,18 +103,22 @@ main { padding-top: 61px; }
 }
 
 .hero-eyebrow {
-  font-size: 0.7rem;
-  letter-spacing: 0.15em;
-  font-weight: 500;
-  opacity: 0.45;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  opacity: 0.55;
   margin-bottom: 1.5rem;
 }
 
 .hero-title {
   font-family: var(--font-display);
-  font-size: clamp(5rem, 13vw, 13rem);
-  line-height: 0.92;
-  letter-spacing: -0.01em;
+  font-size: clamp(4.5rem, 12vw, 12rem);
+  font-weight: 700;
+  font-style: italic;
+  line-height: 0.9;
+  letter-spacing: -0.02em;
   margin-bottom: 2.5rem;
 }
 
@@ -178,8 +182,10 @@ main { padding-top: 61px; }
 .intro-left h2 {
   font-family: var(--font-display);
   font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-style: italic;
+  font-weight: 700;
   line-height: 1;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
 }
 
 .intro-right p {
@@ -217,8 +223,9 @@ main { padding-top: 61px; }
 .service-num {
   display: block;
   font-family: var(--font-display);
-  font-size: 3rem;
-  opacity: 0.15;
+  font-style: italic;
+  font-size: 3.5rem;
+  opacity: 0.18;
   margin-bottom: 1rem;
   line-height: 1;
 }
@@ -278,18 +285,22 @@ footer {
 }
 
 .page-eyebrow {
-  font-size: 0.7rem;
-  letter-spacing: 0.15em;
-  font-weight: 500;
-  opacity: 0.45;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  opacity: 0.55;
   margin-bottom: 1.5rem;
 }
 
 .page-title {
   font-family: var(--font-display);
-  font-size: clamp(4rem, 10vw, 10rem);
+  font-size: clamp(3.5rem, 9vw, 9rem);
+  font-weight: 700;
+  font-style: italic;
   line-height: 0.9;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 /* ─── CONTENT SECTIONS ──────────────────────────────── */
