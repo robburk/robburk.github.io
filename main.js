@@ -31,11 +31,9 @@ document.querySelectorAll('.mobile-menu a').forEach(link => {
   // Arrive: wipe starts covering screen, then slides off
   wipe.classList.add('wipe-cover', `wipe-from-${thisDir}`);
 
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      wipe.classList.add('wipe-retreat');
-    });
-  });
+  setTimeout(() => {
+    wipe.classList.add('wipe-retreat');
+  }, 80);
 
   // Depart: intercept internal link clicks
   document.addEventListener('click', e => {
