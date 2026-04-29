@@ -1036,3 +1036,10 @@ footer {
   .ba-col { padding: 3rem 1.5rem; }
   .tier { padding: 2.5rem 1.5rem; }
 }
+
+/* ─── GSAP HERO INIT (prevent flash) ────────────────────── */
+.hero-title .word,
+.page-title .word {
+  display: inline-block;
+  will-change: transform, opacity;
+}

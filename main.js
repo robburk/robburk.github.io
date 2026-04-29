@@ -10,32 +10,24 @@ document.querySelectorAll('.mobile-menu a').forEach(link => {
 });
 
 // ── PAGE WIPE TRANSITION ──────────────────────────────────
-// On arrival: wipe retreats off screen (reveal)
-// On departure: wipe sweeps across screen (cover), then navigates
-// Direction alternates L→R and R→L each visit
-
 (function () {
   const wipe = document.createElement('div');
   wipe.id = 'page-wipe';
   document.body.appendChild(wipe);
 
-  // Read direction from storage, flip it, save
   const lastDir = localStorage.getItem('wipeDir') || 'left';
   const thisDir = lastDir === 'left' ? 'right' : 'left';
   localStorage.setItem('wipeDir', thisDir);
 
-  // Next page's theme color is already on <html> via the theme script
   const nextTheme = document.documentElement.getAttribute('data-theme');
   wipe.style.background = nextTheme === 'dark' ? '#0D0D0D' : '#FFFFFF';
 
-  // Arrive: wipe starts covering screen, then slides off
   wipe.classList.add('wipe-cover', `wipe-from-${thisDir}`);
 
   setTimeout(() => {
     wipe.classList.add('wipe-retreat');
   }, 80);
 
-  // Depart: intercept internal link clicks
   document.addEventListener('click', e => {
     const link = e.target.closest('a');
     if (!link) return;
@@ -43,7 +35,6 @@ document.querySelectorAll('.mobile-menu a').forEach(link => {
     if (!href || href.startsWith('http') || href.startsWith('mailto') || href.startsWith('#')) return;
     e.preventDefault();
 
-    // Wipe covers screen before navigating
     wipe.classList.remove('wipe-retreat');
     wipe.classList.add('wipe-cover-out');
 
@@ -104,7 +95,7 @@ if (heroTitle) {
 
 // ── SCROLL REVEAL ─────────────────────────────────────────
 const revealEls = document.querySelectorAll(
-  '.hero-title, .page-title, .intro-left h2, .service-item, .case-card, .content-body h3, .service-row, .bottom-cta h2'
+  '.page-title, .intro-left h2, .service-item, .case-card, .content-body h3, .service-row, .bottom-cta h2'
 );
 
 const observer = new IntersectionObserver((entries) => {
@@ -119,4 +110,44 @@ const observer = new IntersectionObserver((entries) => {
 revealEls.forEach(el => {
   el.classList.add('reveal-ready');
   observer.observe(el);
+});
+
+// ── HERO TITLE ANIMATION (GSAP + SplitType) ───────────────
+// Runs after wipe retreats so timing feels cinematic
+window.addEventListener('load', () => {
+  if (typeof gsap === 'undefined' || typeof SplitType === 'undefined') return;
+
+  const titleEl = document.querySelector('.hero-title');
+  if (!titleEl) return;
+
+  // Split into words
+  const split = new SplitType(titleEl, { types: 'words' });
+
+  // Set initial state — words invisible, shifted down slightly
+  gsap.set(split.words, { opacity: 0, y: 30 });
+
+  // Animate in after a short delay to let wipe finish retreating
+  gsap.to(split.words, {
+    opacity: 1,
+    y: 0,
+    duration: 0.7,
+    ease: 'power3.out',
+    stagger: 0.08,
+    delay: 0.5
+  });
+
+  // Also animate page-title on inner pages
+  const pageTitleEl = document.querySelector('.page-title');
+  if (pageTitleEl) {
+    const pageSplit = new SplitType(pageTitleEl, { types: 'words' });
+    gsap.set(pageSplit.words, { opacity: 0, y: 30 });
+    gsap.to(pageSplit.words, {
+      opacity: 1,
+      y: 0,
+      duration: 0.7,
+      ease: 'power3.out',
+      stagger: 0.08,
+      delay: 0.5
+    });
+  }
 });
