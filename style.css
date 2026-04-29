@@ -825,3 +825,34 @@ footer {
   transform: translateX(0) !important;
   transition: transform 0.55s cubic-bezier(0.76, 0, 0.24, 1) !important;
 }
+
+/* ─── CASE STUDY SECTIONS ────────────────────────────────── */
+.case-section {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid currentColor;
+  opacity: 0.9;
+}
+
+.case-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.case-label {
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  opacity: 0.4;
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+}
+
+.case-section p {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}
+
+.case-section p:last-child { margin-bottom: 0; }
