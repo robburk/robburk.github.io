@@ -789,3 +789,41 @@ footer {
 .service-item--minimal:hover { opacity: 0.5; }
 
 .service-item--minimal p { display: none; }
+
+/* ─── PAGE WIPE TRANSITION ───────────────────────────────── */
+#page-wipe {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 99999;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* Arrive from left: starts covering, retreats left */
+#page-wipe.wipe-from-left {
+  left: 0;
+  transform: translateX(0);
+}
+#page-wipe.wipe-from-left.wipe-retreat {
+  transform: translateX(-100%);
+  transition: transform 0.55s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* Arrive from right: starts covering, retreats right */
+#page-wipe.wipe-from-right {
+  left: 0;
+  transform: translateX(0);
+}
+#page-wipe.wipe-from-right.wipe-retreat {
+  transform: translateX(100%);
+  transition: transform 0.55s cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* Depart: covers screen */
+#page-wipe.wipe-cover-out {
+  pointer-events: all;
+  transform: translateX(0) !important;
+  transition: transform 0.45s cubic-bezier(0.76, 0, 0.24, 1) !important;
+}

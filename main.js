@@ -9,11 +9,55 @@ document.querySelectorAll('.mobile-menu a').forEach(link => {
   });
 });
 
+// ── PAGE WIPE TRANSITION ──────────────────────────────────
+// On arrival: wipe retreats off screen (reveal)
+// On departure: wipe sweeps across screen (cover), then navigates
+// Direction alternates L→R and R→L each visit
+
+(function () {
+  const wipe = document.createElement('div');
+  wipe.id = 'page-wipe';
+  document.body.appendChild(wipe);
+
+  // Read direction from storage, flip it, save
+  const lastDir = localStorage.getItem('wipeDir') || 'left';
+  const thisDir = lastDir === 'left' ? 'right' : 'left';
+  localStorage.setItem('wipeDir', thisDir);
+
+  // Next page's theme color is already on <html> via the theme script
+  const nextTheme = document.documentElement.getAttribute('data-theme');
+  wipe.style.background = nextTheme === 'dark' ? '#0D0D0D' : '#FFFFFF';
+
+  // Arrive: wipe starts covering screen, then slides off
+  wipe.classList.add('wipe-cover', `wipe-from-${thisDir}`);
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      wipe.classList.add('wipe-retreat');
+    });
+  });
+
+  // Depart: intercept internal link clicks
+  document.addEventListener('click', e => {
+    const link = e.target.closest('a');
+    if (!link) return;
+    const href = link.getAttribute('href');
+    if (!href || href.startsWith('http') || href.startsWith('mailto') || href.startsWith('#')) return;
+    e.preventDefault();
+
+    // Wipe covers screen before navigating
+    wipe.classList.remove('wipe-retreat');
+    wipe.classList.add('wipe-cover-out');
+
+    wipe.addEventListener('transitionend', () => {
+      window.location.href = href;
+    }, { once: true });
+  });
+})();
+
 // ── FADE IN ───────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  document.body.style.opacity = 0;
-  document.body.style.transition = 'opacity 0.4s ease';
-  setTimeout(() => { document.body.style.opacity = 1; }, 30);
+  document.body.style.opacity = 1;
 });
 
 // ── CIRCLE CURSOR (desktop only) ──────────────────────────
