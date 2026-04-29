@@ -946,3 +946,93 @@ footer {
   .fit-list { grid-template-columns: 1fr; }
   .contact-intro { padding: 2rem 1.5rem 0; }
 }
+
+/* ─── HERO ASIDE ─────────────────────────────────────────── */
+.hero-aside {
+  font-size: 0.85rem;
+  font-weight: 300;
+  opacity: 0.45;
+  margin-top: 1.5rem;
+  max-width: 480px;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+}
+
+/* ─── BEFORE / AFTER ─────────────────────────────────────── */
+.before-after {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid currentColor;
+}
+
+.ba-col {
+  padding: 4rem 2.5rem;
+}
+
+.ba-before {
+  border-right: 1px solid currentColor;
+}
+
+.ba-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+}
+
+.ba-list li {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid currentColor;
+  opacity: 0.6;
+}
+
+.ba-before .ba-list li { opacity: 0.45; }
+.ba-after .ba-list li  { opacity: 0.75; }
+
+.ba-list li:last-child { border-bottom: none; }
+
+.ba-before .ba-list li::before { content: '— '; opacity: 0.4; }
+.ba-after  .ba-list li::before { content: '+ '; opacity: 0.6; }
+
+/* ─── SERVICE TIERS ──────────────────────────────────────── */
+.service-tiers {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-bottom: 1px solid currentColor;
+}
+
+.tier {
+  padding: 3rem 2.5rem;
+  border-right: 1px solid currentColor;
+}
+
+.tier:last-child { border-right: none; }
+
+.tier-name {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 1rem;
+}
+
+.tier p {
+  font-size: 0.85rem;
+  line-height: 1.75;
+  opacity: 0.55;
+}
+
+/* ─── MOBILE ─────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .before-after { grid-template-columns: 1fr; }
+  .ba-before { border-right: none; border-bottom: 1px solid currentColor; }
+  .service-tiers { grid-template-columns: 1fr; }
+  .tier { border-right: none; border-bottom: 1px solid currentColor; }
+  .tier:last-child { border-bottom: none; }
+}
+
+@media (max-width: 600px) {
+  .ba-col { padding: 3rem 1.5rem; }
+  .tier { padding: 2.5rem 1.5rem; }
+}
