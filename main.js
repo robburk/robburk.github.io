@@ -1,15 +1,3 @@
-// ── THEME TOGGLE ─────────────────────────────────────────
-// Every page visit flips the theme from the previous one.
-// We read the LAST theme from localStorage, flip it, apply it,
-// then store the new value so the next page flips again.
-
-(function () {
-  const last = localStorage.getItem('theme') || 'light';
-  const next = last === 'light' ? 'dark' : 'light';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('theme', next);
-})();
-
 // ── MOBILE MENU ───────────────────────────────────────────
 function toggleMenu() {
   document.getElementById('mobileMenu').classList.toggle('open');
