@@ -76,16 +76,16 @@ document.addEventListener('pointerdown', e => {
   ripple.addEventListener('animationend', () => ripple.remove());
 });
 
-// ── HERO PARALLAX (scroll) ────────────────────────────────
-const heroTitle = document.querySelector('.hero-title');
-if (heroTitle) {
+// ── PARALLAX FADE (hero + page titles) ───────────────────
+const parallaxEl = document.querySelector('.hero-title') || document.querySelector('.page-title');
+if (parallaxEl) {
   let ticking = false;
   window.addEventListener('scroll', () => {
     if (!ticking) {
       requestAnimationFrame(() => {
         const y = window.scrollY;
-        heroTitle.style.transform = `translateY(${y * 0.14}px)`;
-        heroTitle.style.opacity = Math.max(0.05, 1 - y * 0.003);
+        parallaxEl.style.transform = `translateY(${y * 0.14}px)`;
+        parallaxEl.style.opacity = Math.max(0.05, 1 - y * 0.003);
         ticking = false;
       });
       ticking = true;
