@@ -545,3 +545,24 @@ footer {
 
 .service-item.reveal-ready { transition-delay: calc(var(--i, 0) * 0.08s); }
 .case-card.reveal-ready    { transition-delay: calc(var(--i, 0) * 0.1s); }
+
+/* ─── ABOUT PHOTO ────────────────────────────────────────── */
+.about-photo-section {
+  padding: 0 2.5rem;
+  border-bottom: 1px solid currentColor;
+}
+
+.about-photo {
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 1;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+  filter: grayscale(100%) contrast(1.1);
+}
+
+@media (max-width: 600px) {
+  .about-photo-section { padding: 0 1.5rem; }
+  .about-photo { max-width: 100%; }
+}
