@@ -149,7 +149,7 @@ function animateTitle(el, delay) {
 }
 
 
-// ── SYSTEM MAP: LIVE DATA DECRYPT ─────────────────────────
+// ── SYSTEM MAP: SCAN + DECRYPT ────────────────────────────
 (function() {
   const sysmap = document.querySelector('.sysmap');
   if (!sysmap) return;
@@ -157,66 +157,34 @@ function animateTitle(el, delay) {
   const afterItems = sysmap.querySelectorAll('.sysmap-after .sysmap-item');
   if (!afterItems.length) return;
 
-  // Cache the final text strings, set initial scrambled state
-  const SCRAMBLE_CHARS = '!<>-_/[]{}=+*?#@$%&0123456789ABCDEFXYZ';
-  const randChar = () => SCRAMBLE_CHARS[(Math.random() * SCRAMBLE_CHARS.length) | 0];
+  const SCRAMBLE = '!<>-_/[]{}=+*?#@$%&0123456789ABCDEFXYZ';
+  const randChar = () => SCRAMBLE[(Math.random() * SCRAMBLE.length) | 0];
 
-  function scrambleString(finalText) {
-    let out = '';
-    for (let i = 0; i < finalText.length; i++) {
-      const c = finalText[i];
-      if (c === ' ' || c === '—' || c === '-') {
-        out += c;
-      } else {
-        out += randChar();
-      }
-    }
-    return out;
-  }
-
+  // Cache final text, set initial hidden state
   const targets = Array.from(afterItems).map(item => {
     const textEl = item.querySelector('.sm-text');
     const checkEl = item.querySelector('.sm-status');
     const finalText = textEl.textContent.trim();
     textEl.dataset.finalText = finalText;
-    // Initial scrambled state — visible from page load
-    textEl.textContent = scrambleString(finalText);
-    // Items visible immediately at moderate opacity
-    item.style.opacity = '0.45';
-    checkEl.style.opacity = '0.25';
-    return { item, textEl, checkEl, finalText, locked: false };
+    item.style.opacity = '0';
+    if (checkEl) checkEl.style.opacity = '0';
+    return { item, textEl, checkEl, finalText };
   });
 
-  // ── Ambient cycling: every ~2.4s reshuffle the scrambled chars ──
-  let ambientInterval = setInterval(() => {
-    targets.forEach(t => {
-      if (!t.locked) {
-        t.textEl.textContent = scrambleString(t.finalText);
-      }
+  // Decrypt one row: scramble cycles for each char, locks at random fraction of duration
+  function decryptRow(t, duration) {
+    const finalText = t.finalText;
+    const len = finalText.length;
+    const lockAt = Array.from({ length: len }, (_, i) => {
+      const c = finalText[i];
+      if (c === ' ' || c === '\u2014' || c === '-') return 0;
+      return duration * (0.30 + Math.random() * 0.65);
     });
-  }, 2400);
+    const startTime = performance.now();
 
-  // ── Resolve a single row's text: scramble → settle to final ──
-  function resolveRow(t, duration = 600) {
     return new Promise(resolve => {
-      const finalText = t.finalText;
-      const len = finalText.length;
-      const lockAt = Array.from({ length: len }, (_, i) => {
-        const c = finalText[i];
-        if (c === ' ' || c === '—' || c === '-') return 0;
-        return duration * (0.25 + Math.random() * 0.7);
-      });
-      const startTime = performance.now();
-      let lastFrame = 0;
-
       function frame(now) {
         const elapsed = now - startTime;
-        if (now - lastFrame < 33 && elapsed < duration) {
-          requestAnimationFrame(frame);
-          return;
-        }
-        lastFrame = now;
-
         let out = '';
         for (let i = 0; i < len; i++) {
           if (elapsed >= lockAt[i]) {
@@ -228,12 +196,10 @@ function animateTitle(el, delay) {
           }
         }
         t.textEl.textContent = out;
-
         if (elapsed < duration) {
           requestAnimationFrame(frame);
         } else {
           t.textEl.textContent = finalText;
-          t.locked = true;
           resolve();
         }
       }
@@ -241,79 +207,46 @@ function animateTitle(el, delay) {
     });
   }
 
-  // ── Periodic blip: a single char on a random locked row briefly scrambles ──
-  function startBlips() {
-    setInterval(() => {
-      const lockedTargets = targets.filter(t => t.locked);
-      if (!lockedTargets.length) return;
-      const t = lockedTargets[(Math.random() * lockedTargets.length) | 0];
-      const text = t.finalText;
-      // pick a random non-space char index
-      let idx = (Math.random() * text.length) | 0;
-      let attempts = 0;
-      while (attempts < 8 && (text[idx] === ' ' || text[idx] === '—' || text[idx] === '-')) {
-        idx = (Math.random() * text.length) | 0;
-        attempts++;
-      }
-      // Run a brief glitch on that one char
-      const glitchDuration = 380;
-      const startTime = performance.now();
-      const original = text[idx];
-
-      function tick(now) {
-        const elapsed = now - startTime;
-        if (elapsed >= glitchDuration) {
-          // restore
-          t.textEl.textContent = text;
-          return;
-        }
-        const chars = text.split('');
-        chars[idx] = randChar();
-        t.textEl.textContent = chars.join('');
-        setTimeout(() => requestAnimationFrame(tick), 50);
-      }
-      requestAnimationFrame(tick);
-    }, 5000 + Math.random() * 4000);
-  }
-
-  // ── Trigger sequence on scroll into view ──
+  // Master sequence: scan line sweeps + each row materializes and decrypts as scan crosses
   function runSequence() {
     if (sysmap.classList.contains('sm-active')) return;
     sysmap.classList.add('sm-active');
 
-    // Stop ambient reshuffles — the resolveRow loop owns the text now
-    clearInterval(ambientInterval);
-
     const useGsap = typeof gsap !== 'undefined';
-
-    // Animate the scan line + bring full opacity to row + resolve text in stagger
     const scanLine = sysmap.querySelector('.sm-scanline');
+    const totalScan = 1.6;
+
     if (useGsap && scanLine) {
       gsap.fromTo(scanLine,
-        { opacity: 0, top: 0 },
-        { opacity: 1, top: '100%', duration: 1.8, ease: 'power1.inOut',
-          onComplete: () => gsap.to(scanLine, { opacity: 0, duration: 0.5 })
+        { opacity: 0, top: '0%' },
+        { opacity: 1, top: '100%', duration: totalScan, ease: 'power1.inOut',
+          onComplete: () => gsap.to(scanLine, { opacity: 0, duration: 0.4 })
         }
       );
+    } else if (scanLine) {
+      scanLine.style.transition = 'top 1.6s ease-in-out, opacity 0.4s';
+      requestAnimationFrame(() => {
+        scanLine.style.opacity = '1';
+        scanLine.style.top = '100%';
+      });
+      setTimeout(() => { scanLine.style.opacity = '0'; }, totalScan * 1000);
     }
 
     targets.forEach((t, i) => {
-      const delay = 100 + i * 130;
+      const rowDelay = (0.08 + i * 0.13) * 1000;
       setTimeout(() => {
         if (useGsap) {
-          gsap.to(t.item, { opacity: 0.92, duration: 0.4, ease: 'power2.out' });
-          gsap.to(t.checkEl, { opacity: 0.75, duration: 0.4, delay: 0.5, ease: 'power2.out' });
-        } else {
-          t.item.style.opacity = '0.92';
-          t.checkEl.style.opacity = '0.75';
-        }
-        resolveRow(t, 650).then(() => {
-          // Once all are locked, start the blip loop
-          if (i === targets.length - 1) {
-            setTimeout(startBlips, 800);
+          gsap.to(t.item, { opacity: 0.92, duration: 0.35, ease: 'power2.out' });
+          if (t.checkEl) {
+            gsap.to(t.checkEl, { opacity: 0.75, duration: 0.4, delay: 0.25, ease: 'power2.out' });
           }
-        });
-      }, delay);
+        } else {
+          t.item.style.transition = 'opacity 0.4s ease';
+          t.item.style.opacity = '0.92';
+          if (t.checkEl) t.checkEl.style.opacity = '0.75';
+        }
+        decryptRow(t, 550);
+      }, rowDelay);
     });
   }
 
@@ -324,7 +257,7 @@ function animateTitle(el, delay) {
         sysmapObserver.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+  }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
 
   sysmapObserver.observe(sysmap);
 })();
