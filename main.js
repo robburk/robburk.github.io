@@ -148,6 +148,29 @@ function animateTitle(el, delay) {
   // If font not loaded: words are visible by default, no animation — title still shows
 }
 
+
+// ── SYSTEM MAP ANIMATION ──────────────────────────────────
+(function() {
+  const sysmap = document.querySelector('.sysmap');
+  if (!sysmap) return;
+
+  const afterItems = sysmap.querySelectorAll('.sysmap-after .sysmap-item');
+
+  const sysmapObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // activate section
+        sysmap.classList.add('sm-active');
+        // stagger each after item
+        afterItems.forEach(item => item.classList.add('sm-revealed'));
+        sysmapObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.18 });
+
+  sysmapObserver.observe(sysmap);
+})();
+
 // Run after DOM + fonts ready
 document.addEventListener('DOMContentLoaded', () => {
   const run = () => {

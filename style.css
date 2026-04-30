@@ -1303,3 +1303,155 @@ nav ul li a:hover::after {
   .deliverables { padding: 3rem 1.5rem; }
   .deliverables-grid { grid-template-columns: 1fr 1fr; }
 }
+
+/* ─── SYSTEM MAP ─────────────────────────────────────────── */
+.sysmap {
+  border-top: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  padding: 5rem 2.5rem;
+}
+
+.sysmap-eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  opacity: 0.45;
+  margin-bottom: 3.5rem;
+}
+
+.sysmap-grid {
+  display: grid;
+  grid-template-columns: 1fr 32px 1fr;
+  gap: 0 2rem;
+  max-width: 860px;
+}
+
+.sysmap-col-label {
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  opacity: 0.35;
+  margin-bottom: 1.75rem;
+}
+
+/* ── BEFORE column: fragmented, slightly loose ── */
+.sysmap-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sysmap-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.65rem;
+  padding: 0.6rem 0;
+  border-top: 1px solid currentColor;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 300;
+  line-height: 1.5;
+}
+
+.sysmap-item:last-child { border-bottom: 1px solid currentColor; }
+
+.sm-status {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+  width: 14px;
+  opacity: 0.5;
+}
+
+/* before column items: desaturated, offset, fragmented feel */
+.sysmap-before .sysmap-item {
+  opacity: 0.32;
+  border-color: currentColor;
+}
+
+/* subtle random offsets make it feel scattered */
+.sm-b-0 { transform: translateX(3px); }
+.sm-b-1 { transform: translateX(-2px); }
+.sm-b-2 { transform: translateX(5px); }
+.sm-b-3 { transform: translateX(-1px); }
+.sm-b-4 { transform: translateX(4px); }
+.sm-b-5 { transform: translateX(-3px); }
+.sm-b-6 { transform: translateX(2px); }
+.sm-b-7 { transform: translateX(-4px); }
+.sm-b-8 { transform: translateX(1px); }
+
+/* ── AFTER column: hidden initially, assembles on scroll ── */
+.sysmap-after .sysmap-item {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.sysmap-after .sysmap-item.sm-revealed {
+  opacity: 0.88;
+  transform: translateY(0);
+}
+
+.sm-check {
+  opacity: 0.7;
+}
+
+/* stagger delays */
+.sm-a-0 { transition-delay: 0ms; }
+.sm-a-1 { transition-delay: 60ms; }
+.sm-a-2 { transition-delay: 120ms; }
+.sm-a-3 { transition-delay: 180ms; }
+.sm-a-4 { transition-delay: 240ms; }
+.sm-a-5 { transition-delay: 300ms; }
+.sm-a-6 { transition-delay: 360ms; }
+.sm-a-7 { transition-delay: 420ms; }
+.sm-a-8 { transition-delay: 480ms; }
+
+/* ── Divider ── */
+.sysmap-divider {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding-top: 2.8rem; /* align with list start */
+}
+
+.sysmap-arrow {
+  width: 1px;
+  height: 100%;
+  min-height: 200px;
+  overflow: visible;
+}
+
+/* SVG line draws in on trigger */
+.sm-line {
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+  transition: stroke-dashoffset 0.9s cubic-bezier(0.76, 0, 0.24, 1) 0.1s;
+  opacity: 0.18;
+}
+
+.sysmap.sm-active .sm-line {
+  stroke-dashoffset: 0;
+}
+
+/* when section triggers: before column fades further */
+.sysmap.sm-active .sysmap-before .sysmap-item {
+  opacity: 0.18;
+  transition: opacity 0.6s ease;
+}
+
+/* ── Responsive ── */
+@media (max-width: 700px) {
+  .sysmap { padding: 3rem 1.5rem; }
+  .sysmap-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  .sysmap-divider { display: none; }
+  .sysmap-before { margin-bottom: 3rem; }
+  /* on mobile, before stays at its opacity, after still animates in */
+}
