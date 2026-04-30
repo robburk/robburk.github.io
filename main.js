@@ -141,12 +141,17 @@ function animateTitle(el, delay) {
   });
 }
 
-// Run after DOM + scripts ready
+// Run after DOM + fonts ready
 document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
+  const run = () => {
     animateTitle(document.querySelector('.hero-title'), 0.45);
     animateTitle(document.querySelector('.page-title'), 0.45);
-  }, 100);
+  };
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(run);
+  } else {
+    setTimeout(run, 300);
+  }
 });
 
 // ── SCROLL PROGRESS LINE ──────────────────────────────────
