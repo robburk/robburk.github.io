@@ -35,6 +35,9 @@ document.querySelectorAll('.mobile-menu a').forEach(link => {
     if (!href || href.startsWith('http') || href.startsWith('mailto') || href.startsWith('#')) return;
     e.preventDefault();
 
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    wipe.style.background = currentTheme === 'dark' ? '#FFFFFF' : '#0D0D0D';
+
     wipe.classList.remove('wipe-retreat');
     wipe.classList.add('wipe-cover-out');
 
