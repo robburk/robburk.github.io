@@ -149,103 +149,140 @@ function animateTitle(el, delay) {
 }
 
 
-// ── SYSTEM MAP: SCAN + DECRYPT ────────────────────────────
+// ── SYSTEM MAP: RESOLUTION SCAN ───────────────────────────
 (function() {
   const sysmap = document.querySelector('.sysmap');
   if (!sysmap) return;
 
+  const grid = sysmap.querySelector('.sysmap-grid');
+  const beforeItems = sysmap.querySelectorAll('.sysmap-before .sysmap-item');
   const afterItems = sysmap.querySelectorAll('.sysmap-after .sysmap-item');
   if (!afterItems.length) return;
 
-  const SCRAMBLE = '!<>-_/[]{}=+*?#@$%&0123456789ABCDEFXYZ';
+  const SCRAMBLE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!<>-_/[]{}=+*?#@$%&';
   const randChar = () => SCRAMBLE[(Math.random() * SCRAMBLE.length) | 0];
 
-  // Cache final text, set initial hidden state
-  const targets = Array.from(afterItems).map(item => {
+  // Cache final text. Show items at low opacity with scrambled text from the start.
+  const targets = Array.from(afterItems).map((item, i) => {
     const textEl = item.querySelector('.sm-text');
     const checkEl = item.querySelector('.sm-status');
     const finalText = textEl.textContent.trim();
     textEl.dataset.finalText = finalText;
     item.style.opacity = '0';
-    if (checkEl) checkEl.style.opacity = '0';
-    return { item, textEl, checkEl, finalText };
+    if (checkEl) {
+      checkEl.dataset.finalChar = checkEl.textContent;
+      checkEl.textContent = '·'; // middle dot placeholder
+      checkEl.style.opacity = '0';
+    }
+    return { item, textEl, checkEl, finalText, before: beforeItems[i] };
   });
 
-  // Decrypt one row: scramble cycles for each char, locks at random fraction of duration
+  // Decrypt one row over a duration. Each char locks at a random fraction.
   function decryptRow(t, duration) {
     const finalText = t.finalText;
     const len = finalText.length;
     const lockAt = Array.from({ length: len }, (_, i) => {
       const c = finalText[i];
-      if (c === ' ' || c === '\u2014' || c === '-') return 0;
-      return duration * (0.30 + Math.random() * 0.65);
+      if (c === ' ' || c === '—' || c === '-') return 0;
+      return duration * (0.25 + Math.random() * 0.65);
     });
     const startTime = performance.now();
 
-    return new Promise(resolve => {
-      function frame(now) {
-        const elapsed = now - startTime;
-        let out = '';
-        for (let i = 0; i < len; i++) {
-          if (elapsed >= lockAt[i]) {
-            out += finalText[i];
-          } else if (finalText[i] === ' ') {
-            out += ' ';
-          } else {
-            out += randChar();
-          }
-        }
-        t.textEl.textContent = out;
-        if (elapsed < duration) {
-          requestAnimationFrame(frame);
+    function frame(now) {
+      const elapsed = now - startTime;
+      let out = '';
+      for (let i = 0; i < len; i++) {
+        if (elapsed >= lockAt[i]) {
+          out += finalText[i];
+        } else if (finalText[i] === ' ') {
+          out += ' ';
         } else {
-          t.textEl.textContent = finalText;
-          resolve();
+          out += randChar();
         }
       }
-      requestAnimationFrame(frame);
-    });
+      t.textEl.textContent = out;
+      if (elapsed < duration) {
+        requestAnimationFrame(frame);
+      } else {
+        t.textEl.textContent = finalText;
+      }
+    }
+    requestAnimationFrame(frame);
   }
 
-  // Master sequence: scan line sweeps + each row materializes and decrypts as scan crosses
+  // Master sequence
   function runSequence() {
     if (sysmap.classList.contains('sm-active')) return;
     sysmap.classList.add('sm-active');
 
     const useGsap = typeof gsap !== 'undefined';
     const scanLine = sysmap.querySelector('.sm-scanline');
-    const totalScan = 1.6;
+    const totalScan = 1.8;
 
-    if (useGsap && scanLine) {
-      gsap.fromTo(scanLine,
-        { opacity: 0, top: '0%' },
-        { opacity: 1, top: '100%', duration: totalScan, ease: 'power1.inOut',
-          onComplete: () => gsap.to(scanLine, { opacity: 0, duration: 0.4 })
-        }
-      );
-    } else if (scanLine) {
-      scanLine.style.transition = 'top 1.6s ease-in-out, opacity 0.4s';
-      requestAnimationFrame(() => {
-        scanLine.style.opacity = '1';
-        scanLine.style.top = '100%';
-      });
-      setTimeout(() => { scanLine.style.opacity = '0'; }, totalScan * 1000);
+    // Scan line sweeps from top to bottom of the grid
+    if (scanLine) {
+      if (useGsap) {
+        gsap.set(scanLine, { top: '-2%', opacity: 0 });
+        gsap.to(scanLine, { opacity: 1, duration: 0.18 });
+        gsap.to(scanLine, {
+          top: '102%',
+          duration: totalScan,
+          ease: 'power1.inOut',
+          onComplete: () => gsap.to(scanLine, { opacity: 0, duration: 0.45 })
+        });
+      } else {
+        scanLine.style.transition = 'top 1.8s ease-in-out, opacity 0.45s';
+        requestAnimationFrame(() => {
+          scanLine.style.opacity = '1';
+          scanLine.style.top = '102%';
+        });
+        setTimeout(() => { scanLine.style.opacity = '0'; }, totalScan * 1000);
+      }
     }
 
+    // Each row materializes and decrypts as scan reaches it
     targets.forEach((t, i) => {
-      const rowDelay = (0.08 + i * 0.13) * 1000;
+      const rowDelay = (0.10 + i * 0.14) * 1000;
       setTimeout(() => {
-        if (useGsap) {
-          gsap.to(t.item, { opacity: 0.92, duration: 0.35, ease: 'power2.out' });
-          if (t.checkEl) {
-            gsap.to(t.checkEl, { opacity: 0.75, duration: 0.4, delay: 0.25, ease: 'power2.out' });
+        // brief flash on the matching BEFORE item to show the connection
+        if (t.before) {
+          if (useGsap) {
+            gsap.fromTo(t.before,
+              { opacity: 0.32 },
+              { opacity: 0.55, duration: 0.18, yoyo: true, repeat: 1, ease: 'power2.inOut' }
+            );
+          } else {
+            t.before.style.transition = 'opacity 0.18s ease';
+            t.before.style.opacity = '0.55';
+            setTimeout(() => { t.before.style.opacity = '0.32'; }, 180);
           }
+        }
+
+        // fade in the after item
+        if (useGsap) {
+          gsap.to(t.item, { opacity: 0.92, duration: 0.4, ease: 'power2.out' });
         } else {
           t.item.style.transition = 'opacity 0.4s ease';
           t.item.style.opacity = '0.92';
-          if (t.checkEl) t.checkEl.style.opacity = '0.75';
         }
-        decryptRow(t, 550);
+
+        // decrypt text
+        decryptRow(t, 650);
+
+        // check mark materializes after decrypt
+        if (t.checkEl) {
+          setTimeout(() => {
+            t.checkEl.textContent = t.checkEl.dataset.finalChar || '✓';
+            if (useGsap) {
+              gsap.fromTo(t.checkEl,
+                { opacity: 0, scale: 0.4 },
+                { opacity: 0.85, scale: 1, duration: 0.4, ease: 'back.out(2)' }
+              );
+            } else {
+              t.checkEl.style.opacity = '0.85';
+            }
+          }, 600);
+        }
       }, rowDelay);
     });
   }

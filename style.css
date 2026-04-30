@@ -1328,49 +1328,53 @@ nav ul li a:hover::after {
   position: relative;
 }
 
-/* Horizontal scan line — sweeps top to bottom */
+/* Horizontal scan line — sweeps top to bottom of the grid */
 .sm-scanline {
   position: absolute;
-  left: 0;
-  right: 0;
+  left: -8px;
+  right: -8px;
   top: 0;
   height: 1px;
   background: currentColor;
   opacity: 0;
   pointer-events: none;
-  z-index: 2;
-  box-shadow: 0 0 12px currentColor, 0 0 24px currentColor;
-  mix-blend-mode: difference;
+  z-index: 3;
 }
 
-/* Soft halo trailing the scan line */
-.sm-scanline::after {
+/* Soft halo trailing the scan line — gives it presence without harshness */
+.sm-scanline::before {
   content: '';
   position: absolute;
   left: 0; right: 0;
-  top: -32px;
-  height: 64px;
+  top: -40px;
+  height: 80px;
   background: linear-gradient(
     to bottom,
     transparent 0%,
-    rgba(255, 255, 255, 0.04) 45%,
-    rgba(255, 255, 255, 0.10) 50%,
-    rgba(255, 255, 255, 0.04) 55%,
+    currentColor 50%,
     transparent 100%
   );
+  opacity: 0.08;
   pointer-events: none;
 }
 
-[data-theme="light"] .sm-scanline::after {
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(0, 0, 0, 0.03) 45%,
-    rgba(0, 0, 0, 0.08) 50%,
-    rgba(0, 0, 0, 0.03) 55%,
-    transparent 100%
-  );
+/* Bright accent dot at each end of the line for a precise instrument feel */
+.sm-scanline::after {
+  content: '';
+  position: absolute;
+  left: -3px;
+  top: -2px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow:
+    0 0 8px currentColor,
+    calc(100vw) 0 0 currentColor;
+  /* second dot at right end via box-shadow */
 }
+
+
 
 .sysmap-col-label {
   font-family: var(--font-display);
