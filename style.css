@@ -1504,3 +1504,27 @@ nav ul li a:hover::after {
   .sysmap-before { margin-bottom: 3rem; }
   /* on mobile, before stays at its opacity, after still animates in */
 }
+
+/* ─── AUDIENCE MARQUEE (bottom) ──────────────────────── */
+.marquee-bar--audience {
+  border-top: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  padding: 2.4rem 0 1.6rem;
+  margin-top: 1rem;
+}
+
+.marquee-bar--audience .marquee-eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  opacity: 0.45;
+  padding: 0 2.5rem 1.4rem;
+}
+
+.marquee-bar--audience .marquee-track span {
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  font-weight: 500;
+  opacity: 0.55;
+}
