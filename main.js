@@ -155,18 +155,29 @@ function animateTitle(el, delay) {
   if (!sysmap) return;
 
   const afterItems = sysmap.querySelectorAll('.sysmap-after .sysmap-item');
+  if (!afterItems.length) return;
+
+  function animateIn() {
+    sysmap.classList.add('sm-active');
+    if (typeof gsap !== 'undefined') {
+      gsap.fromTo(afterItems,
+        { opacity: 0, y: 10 },
+        { opacity: 0.92, y: 0, duration: 0.55, stagger: 0.06, ease: 'power2.out' }
+      );
+    } else {
+      // fallback: just show them
+      afterItems.forEach(el => { el.style.opacity = '0.92'; el.style.transform = 'none'; });
+    }
+  }
 
   const sysmapObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        // activate section
-        sysmap.classList.add('sm-active');
-        // stagger each after item
-        afterItems.forEach(item => item.classList.add('sm-revealed'));
+        animateIn();
         sysmapObserver.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.18 });
+  }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
 
   sysmapObserver.observe(sysmap);
 })();
