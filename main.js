@@ -149,44 +149,68 @@ function animateTitle(el, delay) {
 }
 
 
-// ── SYSTEM MAP: SCAN + DECRYPT ANIMATION ──────────────────
+// ── SYSTEM MAP: LIVE DATA DECRYPT ─────────────────────────
 (function() {
   const sysmap = document.querySelector('.sysmap');
   if (!sysmap) return;
 
   const afterItems = sysmap.querySelectorAll('.sysmap-after .sysmap-item');
-  const beforeItems = sysmap.querySelectorAll('.sysmap-before .sysmap-item');
   if (!afterItems.length) return;
 
-  // Cache the final text strings, then blank them so they don't show before decrypt
+  // Cache the final text strings, set initial scrambled state
+  const SCRAMBLE_CHARS = '!<>-_/[]{}=+*?#@$%&0123456789ABCDEFXYZ';
+  const randChar = () => SCRAMBLE_CHARS[(Math.random() * SCRAMBLE_CHARS.length) | 0];
+
+  function scrambleString(finalText) {
+    let out = '';
+    for (let i = 0; i < finalText.length; i++) {
+      const c = finalText[i];
+      if (c === ' ' || c === '—' || c === '-') {
+        out += c;
+      } else {
+        out += randChar();
+      }
+    }
+    return out;
+  }
+
   const targets = Array.from(afterItems).map(item => {
     const textEl = item.querySelector('.sm-text');
     const checkEl = item.querySelector('.sm-status');
     const finalText = textEl.textContent.trim();
     textEl.dataset.finalText = finalText;
-    textEl.textContent = '';
-    checkEl.style.opacity = '0';
-    return { item, textEl, checkEl, finalText };
+    // Initial scrambled state — visible from page load
+    textEl.textContent = scrambleString(finalText);
+    // Items visible immediately at moderate opacity
+    item.style.opacity = '0.45';
+    checkEl.style.opacity = '0.25';
+    return { item, textEl, checkEl, finalText, locked: false };
   });
 
-  // Glyphs used during the scramble. Mix of technical-looking chars.
-  const SCRAMBLE = '!<>-_/[]{}=+*?#@$%&0123456789ABCDEFXYZ';
-  const randChar = () => SCRAMBLE[(Math.random() * SCRAMBLE.length) | 0];
+  // ── Ambient cycling: every ~2.4s reshuffle the scrambled chars ──
+  let ambientInterval = setInterval(() => {
+    targets.forEach(t => {
+      if (!t.locked) {
+        t.textEl.textContent = scrambleString(t.finalText);
+      }
+    });
+  }, 2400);
 
-  function decryptText(textEl, finalText, duration) {
+  // ── Resolve a single row's text: scramble → settle to final ──
+  function resolveRow(t, duration = 600) {
     return new Promise(resolve => {
+      const finalText = t.finalText;
       const len = finalText.length;
-      // Each character locks at a random point between 30% and 95% of duration
       const lockAt = Array.from({ length: len }, (_, i) => {
-        if (finalText[i] === ' ' || finalText[i] === '—' || finalText[i] === '-') return 0;
-        return duration * (0.3 + Math.random() * 0.65);
+        const c = finalText[i];
+        if (c === ' ' || c === '—' || c === '-') return 0;
+        return duration * (0.25 + Math.random() * 0.7);
       });
       const startTime = performance.now();
       let lastFrame = 0;
 
       function frame(now) {
         const elapsed = now - startTime;
-        // throttle to ~30fps for the scramble for a slightly mechanical feel
         if (now - lastFrame < 33 && elapsed < duration) {
           requestAnimationFrame(frame);
           return;
@@ -203,12 +227,13 @@ function animateTitle(el, delay) {
             out += randChar();
           }
         }
-        textEl.textContent = out;
+        t.textEl.textContent = out;
 
         if (elapsed < duration) {
           requestAnimationFrame(frame);
         } else {
-          textEl.textContent = finalText;
+          t.textEl.textContent = finalText;
+          t.locked = true;
           resolve();
         }
       }
@@ -216,46 +241,79 @@ function animateTitle(el, delay) {
     });
   }
 
+  // ── Periodic blip: a single char on a random locked row briefly scrambles ──
+  function startBlips() {
+    setInterval(() => {
+      const lockedTargets = targets.filter(t => t.locked);
+      if (!lockedTargets.length) return;
+      const t = lockedTargets[(Math.random() * lockedTargets.length) | 0];
+      const text = t.finalText;
+      // pick a random non-space char index
+      let idx = (Math.random() * text.length) | 0;
+      let attempts = 0;
+      while (attempts < 8 && (text[idx] === ' ' || text[idx] === '—' || text[idx] === '-')) {
+        idx = (Math.random() * text.length) | 0;
+        attempts++;
+      }
+      // Run a brief glitch on that one char
+      const glitchDuration = 380;
+      const startTime = performance.now();
+      const original = text[idx];
+
+      function tick(now) {
+        const elapsed = now - startTime;
+        if (elapsed >= glitchDuration) {
+          // restore
+          t.textEl.textContent = text;
+          return;
+        }
+        const chars = text.split('');
+        chars[idx] = randChar();
+        t.textEl.textContent = chars.join('');
+        setTimeout(() => requestAnimationFrame(tick), 50);
+      }
+      requestAnimationFrame(tick);
+    }, 5000 + Math.random() * 4000);
+  }
+
+  // ── Trigger sequence on scroll into view ──
   function runSequence() {
+    if (sysmap.classList.contains('sm-active')) return;
     sysmap.classList.add('sm-active');
 
-    if (typeof gsap === 'undefined') {
-      // fallback: just reveal everything cleanly
-      targets.forEach(({ textEl, checkEl, finalText }) => {
-        textEl.textContent = finalText;
-        checkEl.style.opacity = '0.7';
-      });
-      return;
-    }
+    // Stop ambient reshuffles — the resolveRow loop owns the text now
+    clearInterval(ambientInterval);
 
-    const tl = gsap.timeline();
+    const useGsap = typeof gsap !== 'undefined';
 
-    // 1. Animate scan line down across the section
+    // Animate the scan line + bring full opacity to row + resolve text in stagger
     const scanLine = sysmap.querySelector('.sm-scanline');
-    if (scanLine) {
-      tl.set(scanLine, { opacity: 1, top: 0 })
-        .to(scanLine, {
-          top: '100%',
-          duration: 1.6,
-          ease: 'power1.inOut'
-        }, 0)
-        .to(scanLine, { opacity: 0, duration: 0.4, ease: 'power2.out' }, 1.5);
+    if (useGsap && scanLine) {
+      gsap.fromTo(scanLine,
+        { opacity: 0, top: 0 },
+        { opacity: 1, top: '100%', duration: 1.8, ease: 'power1.inOut',
+          onComplete: () => gsap.to(scanLine, { opacity: 0, duration: 0.5 })
+        }
+      );
     }
 
-    // 2. As scan line passes each row, decrypt that row's text
-    targets.forEach(({ item, textEl, checkEl, finalText }, i) => {
-      const rowDelay = 0.08 + i * 0.13; // staggered behind the scan line
-      tl.to(item, {
-        opacity: 0.92,
-        duration: 0.3,
-        ease: 'power2.out',
-        onStart: () => {
-          decryptText(textEl, finalText, 550).then(() => {
-            // lock check in once text is resolved
-            gsap.to(checkEl, { opacity: 0.75, duration: 0.35, ease: 'power2.out' });
-          });
+    targets.forEach((t, i) => {
+      const delay = 100 + i * 130;
+      setTimeout(() => {
+        if (useGsap) {
+          gsap.to(t.item, { opacity: 0.92, duration: 0.4, ease: 'power2.out' });
+          gsap.to(t.checkEl, { opacity: 0.75, duration: 0.4, delay: 0.5, ease: 'power2.out' });
+        } else {
+          t.item.style.opacity = '0.92';
+          t.checkEl.style.opacity = '0.75';
         }
-      }, rowDelay);
+        resolveRow(t, 650).then(() => {
+          // Once all are locked, start the blip loop
+          if (i === targets.length - 1) {
+            setTimeout(startBlips, 800);
+          }
+        });
+      }, delay);
     });
   }
 
@@ -266,7 +324,7 @@ function animateTitle(el, delay) {
         sysmapObserver.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
+  }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
 
   sysmapObserver.observe(sysmap);
 })();
