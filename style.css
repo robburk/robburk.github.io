@@ -1325,6 +1325,51 @@ nav ul li a:hover::after {
   grid-template-columns: 1fr 32px 1fr;
   gap: 0 2rem;
   max-width: 860px;
+  position: relative;
+}
+
+/* Horizontal scan line — sweeps top to bottom */
+.sm-scanline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+  box-shadow: 0 0 12px currentColor, 0 0 24px currentColor;
+  mix-blend-mode: difference;
+}
+
+/* Soft halo trailing the scan line */
+.sm-scanline::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  top: -32px;
+  height: 64px;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 45%,
+    rgba(255, 255, 255, 0.10) 50%,
+    rgba(255, 255, 255, 0.04) 55%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+[data-theme="light"] .sm-scanline::after {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.03) 45%,
+    rgba(0, 0, 0, 0.08) 50%,
+    rgba(0, 0, 0, 0.03) 55%,
+    transparent 100%
+  );
 }
 
 .sysmap-col-label {
@@ -1387,8 +1432,18 @@ nav ul li a:hover::after {
 /* ── AFTER column: hidden initially, assembles on scroll ── */
 .sysmap-after .sysmap-item {
   opacity: 0;
-  transform: translateY(10px);
   /* GSAP handles animation */
+}
+
+.sysmap-after .sm-text {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  white-space: nowrap;
+}
+
+/* Mono-ish vibe during scramble for cleaner glyph transitions */
+.sysmap-after .sm-status {
+  transition: opacity 0.3s ease;
 }
 
 .sm-check {
