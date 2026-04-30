@@ -493,7 +493,7 @@ footer {
 
 @media (max-width: 600px) {
   nav { padding: 1rem 1.5rem; }
-  .hero { padding: 5rem 1.5rem 3rem; }
+  .hero { padding: 3rem 1.5rem 3rem; min-height: 70vh; }
   .intro-grid, .content-section, .services-list, .contact-form, .bottom-cta { padding-left: 1.5rem; padding-right: 1.5rem; }
   .services-preview { grid-template-columns: 1fr; }
   .case-card { padding: 3rem 1.5rem; }

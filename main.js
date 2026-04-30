@@ -124,21 +124,28 @@ revealEls.forEach(el => {
 function animateTitle(el, delay) {
   if (!el || typeof gsap === 'undefined' || typeof SplitType === 'undefined') return;
 
-  // Replace <br> with spaces so SplitType can split cleanly
-  el.innerHTML = el.innerHTML.replace(/<br\s*\/?>/gi, ' ');
+  // Check if futura-pt actually loaded — if not, leave title visible and skip animation
+  const fontLoaded = document.fonts && Array.from(document.fonts).some(f =>
+    f.family.toLowerCase().includes('futura') && f.status === 'loaded'
+  );
+
+  el.innerHTML = el.innerHTML.replace(/<br\s*\/?>\s*/gi, ' ');
 
   const split = new SplitType(el, { types: 'words' });
   if (!split.words || split.words.length === 0) return;
 
-  gsap.set(split.words, { opacity: 0, y: 28 });
-  gsap.to(split.words, {
-    opacity: 1,
-    y: 0,
-    duration: 0.65,
-    ease: 'power3.out',
-    stagger: 0.07,
-    delay: delay || 0.5
-  });
+  if (fontLoaded) {
+    gsap.set(split.words, { opacity: 0, y: 28 });
+    gsap.to(split.words, {
+      opacity: 1,
+      y: 0,
+      duration: 0.65,
+      ease: 'power3.out',
+      stagger: 0.07,
+      delay: delay || 0.5
+    });
+  }
+  // If font not loaded: words are visible by default, no animation — title still shows
 }
 
 // Run after DOM + fonts ready
