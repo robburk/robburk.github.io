@@ -189,6 +189,7 @@ function restartGame(){
 }
 
 function resize(){
+  if(phase==='leaderboard'||phase==='over'||phase==='submitting')return;
   g.w=cv.width=window.innerWidth;
   g.h=cv.height=window.innerHeight;
   g.mouse=g.h/2;g.pl.y=g.h/2;g.ai.y=g.h/2;
