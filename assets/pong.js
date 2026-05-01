@@ -32,7 +32,7 @@ var C=DARK;
 
 var KONAMI=[38,38,40,40,37,39,37,39,66,65],ki=0,kbuf='';
 var active=false,phase='idle',raf=null,lts=0;
-var g={w:0,h:0,mouse:0,pl:{y:0,s:0},ai:{y:0,s:0},b:{x:0,y:0,vx:0,vy:0},flash:0};
+var g={w:0,h:0,mouse:0,pl:{y:0,s:0},ai:{y:0},b:{x:0,y:0,vx:0,vy:0},flash:0,lives:3,blinkHeart:-1,blinkTimer:0};
 var overlay,cv,ctx,lastTap=0,homeBtn,playBtn,initPanel,board=[],myRank=-1;
 
 var params=new URLSearchParams(location.search);
@@ -102,7 +102,7 @@ function launch(){
         '<button data-mode="light" style="font-family:'+FNT+';font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;padding:15px 28px;border:none;background:#f5f5f5;color:#0d0d0d;outline:1px solid rgba(0,0,0,.18);">LIGHT &#8594;</button>'+
       '</div>'+
       '<div style="position:absolute;bottom:'+pad+';left:'+pad+';font-size:9px;letter-spacing:.18em;color:'+wHint+';line-height:2;text-transform:uppercase;">'+
-        'MOUSE OR TOUCH TO MOVE YOUR PADDLE<br>SURVIVE AS LONG AS YOU CAN - AI WINS AT 7<br>DOUBLE-TAP OR ESC TO EXIT'+
+        'MOUSE OR TOUCH TO MOVE YOUR PADDLE<br>HIT THE BALL AS MANY TIMES AS YOU CAN<br>3 LIVES - DOUBLE-TAP OR ESC TO EXIT'+
       '</div>'+
     '</div>';
 
@@ -212,7 +212,7 @@ function teardown(){
 }
 
 function restartGame(){
-  g.pl.s=0;g.ai.s=0;g.flash=0;
+  g.pl.s=0;g.flash=0;g.lives=3;g.blinkHeart=-1;g.blinkTimer=0;
   board=[];myRank=-1;
   if(homeBtn&&homeBtn.parentNode)homeBtn.parentNode.style.display='none';
   if(initPanel)initPanel.style.display='none';
@@ -246,13 +246,16 @@ function bounce(dir,hit){
 
 function scored(who,nd){
   if(who==='ai'){
-    g.ai.s++;g.flash=14;
-    if(g.ai.s>=CFG.AI_WIN){
+    g.lives--;
+    g.blinkHeart=g.lives;
+    g.blinkTimer=55;
+    g.flash=14;
+    if(g.lives<=0){
       phase='over';
-      setTimeout(function(){showInitPanel();},1000);
+      setTimeout(function(){showInitPanel();},1200);
     }else{
-      phase='waiting';resetBall(nd);
-      setTimeout(function(){if(active&&phase==='waiting')phase='playing';},900);
+      phase='waiting';resetBall(1);
+      setTimeout(function(){if(active&&phase==='waiting')phase='playing';},1000);
     }
   }else{
     g.flash=4;
@@ -337,7 +340,7 @@ function update(dt){
   var b=g.b,pl=g.pl,ai=g.ai,w=g.w,h=g.h;
   pl.y+=(g.mouse-pl.y)*.18*dt;
   pl.y=clamp(pl.y,CFG.PH/2,h-CFG.PH/2);
-  var spAI=4+ai.s*.9,noise=Math.max(0,30-ai.s*5)*(Math.random()-.5);
+  var spAI=4+Math.min(g.pl.s*.04,3),noise=Math.max(0,28-g.pl.s*.3)*(Math.random()-.5);
   if(ai.y<b.y+noise-4)ai.y+=spAI;
   if(ai.y>b.y+noise+4)ai.y-=spAI;
   ai.y=clamp(ai.y,CFG.PH/2,h-CFG.PH/2);
@@ -394,15 +397,25 @@ function draw(ts){
   ctx.fillStyle=C.el;
   ctx.fillText(pl.s,w/2,centerY);
 
-  // AI danger indicator top-right
-  var aiSize=clamp(Math.floor(h*.055),24,48);
-  ctx.textAlign='right';ctx.textBaseline='top';
-  ctx.font='700 '+aiSize+'px '+FNT;
-  ctx.fillStyle=ai.s>=5?'rgba(255,80,80,.8)':C.score;
-  ctx.fillText(ai.s+'/7',w-28,20);
-  ctx.font='500 10px '+FNT;
-  ctx.fillStyle=C.hdr;
-  ctx.fillText('AI',w-28,26+aiSize);
+  // Hearts (lives) - top left
+  var hSize=clamp(Math.floor(h*.038),16,28);
+  var hY=20;
+  ctx.textBaseline='top';ctx.font=hSize+'px '+FNT;
+  for(var i=0;i<3;i++){
+    var hx=28+i*(hSize+8);
+    if(i<g.lives){
+      ctx.globalAlpha=1;ctx.fillStyle=C.el;
+      ctx.fillText('\u2665',hx,hY);
+    }else if(g.blinkTimer>0&&i===g.blinkHeart){
+      ctx.globalAlpha=Math.floor(g.blinkTimer/6)%2===0?1:0;
+      ctx.fillStyle=C.el;ctx.fillText('\u2665',hx,hY);
+      ctx.globalAlpha=1;
+    }else{
+      ctx.globalAlpha=0.18;ctx.fillStyle=C.el;
+      ctx.fillText('\u2665',hx,hY);ctx.globalAlpha=1;
+    }
+  }
+  if(g.blinkTimer>0)g.blinkTimer--;
 
   // Exit hint
   ctx.textAlign='center';ctx.textBaseline='top';
