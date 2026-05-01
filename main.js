@@ -122,7 +122,7 @@ function animateTitle(el, delay) {
   const afterItems = sysmap.querySelectorAll('.sysmap-after .sysmap-item');
   if (!afterItems.length) return;
 
-  const SCRAMBLE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!<>-_/[]{}=+*?#@$%&';
+  const SCRAMBLE = 'abcdefghijklmnopqrstuvwxyz0123456789!<>-_=+*?#';
   const randChar = () => SCRAMBLE[(Math.random() * SCRAMBLE.length) | 0];
 
   // Cache final text. Show items at low opacity with scrambled text from the start.
