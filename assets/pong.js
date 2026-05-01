@@ -1,6 +1,13 @@
 (function(){
 'use strict';
 
+// Ensure Futura PT is available (TypeKit kit lnt1dnh)
+if(!document.querySelector('link[href*="lnt1dnh"]')){
+  var _tk=document.createElement('link');
+  _tk.rel='stylesheet';_tk.href='https://use.typekit.net/lnt1dnh.css';
+  document.head.appendChild(_tk);
+}
+
 var API='https://pong-scores.robinrichardburkhardt.workers.dev';
 var FNT='"futura-pt",sans-serif';
 var CFG={AI_WIN:7,PW:8,PH:80,BS:8,SPD:6.5,MAX:16,PM:36};
@@ -50,6 +57,9 @@ document.addEventListener('keydown',function(e){
 function launch(){
   if(active)return;
   active=true;
+  // Bring site cursor dot above our overlay
+  var dot=document.getElementById('cursor-dot');
+  if(dot)dot.style.zIndex='2147483648';
   overlay=document.createElement('div');
   overlay.style.cssText=[
     'position:fixed','inset:0','z-index:2147483647',
@@ -149,6 +159,9 @@ function teardown(){
   active=false;phase='idle';
   cancelAnimationFrame(raf);
   window.removeEventListener('resize',resize);
+  // Restore site cursor dot
+  var dot=document.getElementById('cursor-dot');
+  if(dot)dot.style.zIndex='';
   if(overlay&&overlay.parentNode)overlay.parentNode.removeChild(overlay);
   overlay=cv=ctx=null;
   window.location.href='/';
