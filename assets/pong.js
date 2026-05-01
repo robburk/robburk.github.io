@@ -25,7 +25,7 @@ var C=DARK;
 var KONAMI=[38,38,40,40,37,39,37,39,66,65],ki=0,kbuf='';
 var active=false,phase='idle',raf=null,lts=0;
 var g={w:0,h:0,mouse:0,pl:{y:0,s:0},ai:{y:0,s:0},b:{x:0,y:0,vx:0,vy:0},flash:0,winner:''};
-var overlay,cv,ctx,lastTap=0;
+var overlay,cv,ctx,lastTap=0,homeBtn;
 
 // -- TRIGGERS --
 var params=new URLSearchParams(location.search);
@@ -113,6 +113,19 @@ function selectMode(dark){
   },{passive:false});
   overlay.addEventListener('touchend',function(e){e.preventDefault();},{passive:false});
 
+  homeBtn=document.createElement('a');
+  homeBtn.href='/';
+  homeBtn.style.cssText=[
+    'position:absolute','left:50%','bottom:clamp(28px,5vw,52px)',
+    'transform:translateX(-50%)',
+    'font-family:'+FNT,'font-size:11px','font-weight:500',
+    'letter-spacing:.18em','text-transform:uppercase','text-decoration:none',
+    'padding:14px 28px','display:none','white-space:nowrap',
+    'transition:opacity .2s'
+  ].join(';');
+  homeBtn.textContent='BACK TO SITE \u2192';
+  overlay.appendChild(homeBtn);
+
   resize();
   window.addEventListener('resize',resize);
   restartGame();
@@ -126,10 +139,12 @@ function teardown(){
   window.removeEventListener('resize',resize);
   if(overlay&&overlay.parentNode)overlay.parentNode.removeChild(overlay);
   overlay=cv=ctx=null;
+  window.location.href='/';
 }
 
 function restartGame(){
   g.pl.s=0;g.ai.s=0;g.winner='';g.flash=0;
+  if(homeBtn)homeBtn.style.display='none';
   phase='waiting';resetBall(1);
   setTimeout(function(){if(active&&phase==='waiting')phase='playing';},900);
 }
@@ -160,6 +175,10 @@ function scored(who,nd){
   g.flash=12;
   if(g.pl.s>=CFG.WIN||g.ai.s>=CFG.WIN){
     phase='over';g.winner=g.pl.s>=CFG.WIN?'YOU WIN.':'YOU LOSE.';
+    homeBtn.style.background=C.el;
+    homeBtn.style.color=C.bg;
+    homeBtn.style.outline='1px solid transparent';
+    homeBtn.style.display='block';
   }else{
     phase='waiting';resetBall(nd);
     setTimeout(function(){if(active&&phase==='waiting')phase='playing';},900);
