@@ -325,3 +325,126 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { passive: true });
 })();
 
+// ── PAGE TRANSITION: TILE FLIP ─────────────────────────────
+// On internal link clicks: outgoing page covers the screen with a grid of
+// rotateX-flipping tiles, then navigates. Incoming page reads a sessionStorage
+// flag and animates the same tiles away. Color uses currentColor so palette
+// inversion is preserved between pages.
+(function() {
+  if (typeof window === 'undefined' || !document.body) return;
+
+  const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const COLS = window.matchMedia('(max-width: 800px)').matches ? 5 : 8;
+  const ROWS = window.matchMedia('(max-width: 800px)').matches ? 8 : 6;
+  const TILE_DUR = 280;       // ms per tile flip
+  const COL_STAGGER = 32;     // ms between columns
+  const NAV_AT = 0.78;        // navigate when this fraction of total cover time has elapsed
+  const TOTAL_COVER = TILE_DUR + (COLS - 1) * COL_STAGGER; // ms
+
+  // Build overlay
+  function buildOverlay() {
+    let el = document.getElementById('page-transition');
+    if (el) return el;
+    el = document.createElement('div');
+    el.id = 'page-transition';
+    el.setAttribute('aria-hidden', 'true');
+    const grid = document.createElement('div');
+    grid.className = 'pt-grid';
+    grid.style.setProperty('--pt-cols', COLS);
+    grid.style.setProperty('--pt-rows', ROWS);
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const tile = document.createElement('div');
+        tile.className = 'pt-tile';
+        tile.style.setProperty('--pt-col', c);
+        grid.appendChild(tile);
+      }
+    }
+    el.appendChild(grid);
+    document.body.appendChild(el);
+    return el;
+  }
+
+  function shouldIntercept(e, link) {
+    if (REDUCED) return false;
+    if (e.defaultPrevented) return false;
+    if (e.button !== 0) return false; // only left click
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return false;
+    if (!link || !link.href) return false;
+    if (link.target && link.target !== '_self') return false;
+    if (link.hasAttribute('download')) return false;
+    const url = new URL(link.href, window.location.href);
+    if (url.origin !== window.location.origin) return false;
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return false;
+    // anchor on same page → no transition
+    if (url.pathname === window.location.pathname && url.search === window.location.search && url.hash) return false;
+    // same exact URL → no transition
+    if (url.href === window.location.href) return false;
+    return true;
+  }
+
+  function playOut(targetHref) {
+    const overlay = buildOverlay();
+    overlay.classList.remove('pt-uncover');
+    // ensure starting state
+    overlay.classList.add('pt-active');
+    // next frame so transition triggers
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        overlay.classList.add('pt-cover');
+      });
+    });
+    sessionStorage.setItem('pt_in', '1');
+    sessionStorage.setItem('pt_at', String(Date.now()));
+    // Navigate slightly before tiles fully cover so transition feels continuous
+    const navTime = Math.round(TOTAL_COVER * NAV_AT);
+    setTimeout(() => {
+      window.location.href = targetHref;
+    }, navTime);
+    // Fail-safe: if nav stalls, force reload after 1.2s
+    setTimeout(() => {
+      if (window.location.href !== targetHref) {
+        window.location.href = targetHref;
+      }
+    }, 1200);
+  }
+
+  function playIn() {
+    if (REDUCED) return;
+    const flag = sessionStorage.getItem('pt_in');
+    const at = parseInt(sessionStorage.getItem('pt_at') || '0', 10);
+    sessionStorage.removeItem('pt_in');
+    sessionStorage.removeItem('pt_at');
+    // Stale flag (older than 5s) means user used back/forward or refresh — skip
+    if (!flag || (Date.now() - at) > 5000) return;
+
+    const overlay = buildOverlay();
+    overlay.classList.add('pt-active', 'pt-cover');
+    // next frame, animate uncover
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        overlay.classList.add('pt-uncover');
+      });
+    });
+    // remove overlay after uncover completes
+    setTimeout(() => {
+      overlay.classList.remove('pt-active', 'pt-cover', 'pt-uncover');
+    }, TOTAL_COVER + 80);
+  }
+
+  // Click delegation
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest && e.target.closest('a[href]');
+    if (!link) return;
+    if (!shouldIntercept(e, link)) return;
+    e.preventDefault();
+    playOut(link.href);
+  });
+
+  // Run incoming animation if applicable
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', playIn);
+  } else {
+    playIn();
+  }
+})();
