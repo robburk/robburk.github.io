@@ -129,46 +129,14 @@ function selectMode(dark){
   overlay.appendChild(cv);
   ctx=cv.getContext('2d');
 
-  var btnRow=document.createElement('div');
-  btnRow.style.cssText=[
-    'position:absolute','left:50%','bottom:clamp(28px,5vw,52px)',
-    'transform:translateX(-50%)',
-    'display:none','gap:10px','flex-wrap:wrap','justify-content:center',
-    'white-space:nowrap'
-  ].join(';');
-
-  playBtn=document.createElement('button');
-  playBtn.style.cssText=[
-    'font-family:'+FNT,'font-size:11px','font-weight:500',
-    'letter-spacing:.18em','text-transform:uppercase',
-    'padding:14px 28px','border:none',
-    'outline:1px solid '+C.el,
-    'background:transparent','color:'+C.el
-  ].join(';');
-  playBtn.textContent='PLAY AGAIN';
-  playBtn.addEventListener('click',restartGame);
-
-  homeBtn=document.createElement('a');
-  homeBtn.href='/';
-  homeBtn.style.cssText=[
-    'font-family:'+FNT,'font-size:11px','font-weight:500',
-    'letter-spacing:.18em','text-transform:uppercase','text-decoration:none',
-    'padding:14px 28px',
-    'background:'+C.el,'color:'+C.bg
-  ].join(';');
-  homeBtn.textContent='BACK TO SITE \u2192';
-
-  btnRow.appendChild(playBtn);
-  btnRow.appendChild(homeBtn);
-  overlay.appendChild(btnRow);
-
   initPanel=document.createElement('div');
   initPanel.style.cssText=[
-    'position:absolute','inset:0',
-    'display:none','flex-direction:column',
-    'align-items:center','justify-content:center',
-    'background:'+C.overBg,
-    'font-family:'+FNT,'touch-action:auto'
+    'position:absolute','bottom:0','left:0','right:0',
+    'display:none','flex-wrap:wrap','align-items:center','gap:12px',
+    'padding:18px clamp(24px,5vw,64px)',
+    'font-family:'+FNT,'touch-action:auto',
+    'border-top:1px solid '+(C===DARK?'rgba(255,255,255,.1)':'rgba(0,0,0,.1)'),
+    'background:'+C.overBg
   ].join(';');
   overlay.appendChild(initPanel);
 
@@ -214,9 +182,8 @@ function teardown(){
 function restartGame(){
   g.pl.s=0;g.flash=0;g.lives=3;g.blinkHeart=-1;g.blinkTimer=0;
   board=[];myRank=-1;
-  if(homeBtn&&homeBtn.parentNode)homeBtn.parentNode.style.display='none';
   if(initPanel)initPanel.style.display='none';
-  if(overlay){overlay.style.touchAction='none';}
+  if(overlay)overlay.style.touchAction='none';
   phase='waiting';resetBall(1);
   setTimeout(function(){if(active&&phase==='waiting')phase='playing';},900);
 }
@@ -252,7 +219,15 @@ function scored(who,nd){
     g.flash=14;
     if(g.lives<=0){
       phase='over';
-      setTimeout(function(){showInitPanel();},1200);
+      setTimeout(function(){
+        fetch(API).then(function(r){return r.json();}).then(function(data){
+          board=Array.isArray(data)?data:[];
+        }).catch(function(){board=[];}).finally(function(){
+          myRank=-1;phase='leaderboard';
+          overlay.style.touchAction='auto';
+          showInitPanel();
+        });
+      },1200);
     }else{
       phase='waiting';resetBall(1);
       setTimeout(function(){if(active&&phase==='waiting')phase='playing';},1000);
@@ -264,24 +239,31 @@ function scored(who,nd){
   }
 }
 
+function buildActionBtns(){
+  var tc=C.el,bc=C.bg;
+  var btnBase='font-family:'+FNT+';font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;padding:12px 22px;border:none;';
+  return '<button id="po-again" style="'+btnBase+'outline:1px solid '+tc+';background:transparent;color:'+tc+';">PLAY AGAIN</button>'+
+         '<a href="/" style="font-family:'+FNT+';font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;padding:12px 22px;text-decoration:none;background:'+tc+';color:'+bc+';">BACK TO SITE &#8594;</a>';
+}
+
 function showInitPanel(){
-  var tc=C.el,dc=C.hdr,bc=C===DARK?'rgba(255,255,255,.2)':'rgba(0,0,0,.2)';
+  var tc=C.el,dc=C.hdr,bc=C===DARK?'rgba(255,255,255,.15)':'rgba(0,0,0,.15)';
+  var inpStyle='width:44px;height:56px;background:transparent;border:1px solid '+bc+';color:'+tc+';font-family:'+FNT+';font-size:24px;font-weight:700;text-align:center;text-transform:uppercase;-webkit-text-transform:uppercase;outline:none;';
+  var btnBase='font-family:'+FNT+';font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;padding:12px 22px;border:none;';
+
   initPanel.style.display='flex';
   initPanel.innerHTML=
-    '<div style="font-size:10px;font-weight:500;letter-spacing:.25em;color:'+dc+';margin-bottom:12px;text-transform:uppercase;">GAME OVER</div>'+
-    '<div style="font-size:clamp(64px,12vw,120px);font-weight:700;line-height:1;letter-spacing:-.02em;color:'+tc+';margin-bottom:8px;">'+g.pl.s+'</div>'+
-    '<div style="font-size:10px;font-weight:500;letter-spacing:.2em;color:'+dc+';margin-bottom:32px;text-transform:uppercase;">POINTS SCORED</div>'+
-    '<div style="width:48px;height:1px;background:'+bc+';margin-bottom:28px;"></div>'+
-    '<div style="font-size:10px;font-weight:500;letter-spacing:.22em;color:'+dc+';margin-bottom:14px;text-transform:uppercase;">ENTER YOUR INITIALS</div>'+
-    '<div style="display:flex;gap:8px;margin-bottom:24px;" id="po-slots">'+
-      '<input id="po-0" maxlength="1" autocomplete="off" autocorrect="off" spellcheck="false" style="width:54px;height:68px;background:transparent;border:1px solid '+bc+';color:'+tc+';font-family:'+FNT+';font-size:30px;font-weight:700;text-align:center;text-transform:uppercase;-webkit-text-transform:uppercase;outline:none;" />'+
-      '<input id="po-1" maxlength="1" autocomplete="off" autocorrect="off" spellcheck="false" style="width:54px;height:68px;background:transparent;border:1px solid '+bc+';color:'+tc+';font-family:'+FNT+';font-size:30px;font-weight:700;text-align:center;text-transform:uppercase;-webkit-text-transform:uppercase;outline:none;" />'+
-      '<input id="po-2" maxlength="1" autocomplete="off" autocorrect="off" spellcheck="false" style="width:54px;height:68px;background:transparent;border:1px solid '+bc+';color:'+tc+';font-family:'+FNT+';font-size:30px;font-weight:700;text-align:center;text-transform:uppercase;-webkit-text-transform:uppercase;outline:none;" />'+
+    '<div style="font-size:10px;font-weight:500;letter-spacing:.2em;color:'+dc+';text-transform:uppercase;white-space:nowrap;">SCORE <strong style="color:'+tc+';font-size:18px;">'+g.pl.s+'</strong></div>'+
+    '<div style="width:1px;height:32px;background:'+bc+';flex-shrink:0;"></div>'+
+    '<div style="font-size:10px;font-weight:500;letter-spacing:.2em;color:'+dc+';text-transform:uppercase;white-space:nowrap;">INITIALS</div>'+
+    '<div style="display:flex;gap:6px;" id="po-slots">'+
+      '<input id="po-0" maxlength="1" autocomplete="off" autocorrect="off" spellcheck="false" style="'+inpStyle+'" />'+
+      '<input id="po-1" maxlength="1" autocomplete="off" autocorrect="off" spellcheck="false" style="'+inpStyle+'" />'+
+      '<input id="po-2" maxlength="1" autocomplete="off" autocorrect="off" spellcheck="false" style="'+inpStyle+'" />'+
     '</div>'+
-    '<button id="po-sub" style="font-family:'+FNT+';font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;padding:15px 36px;cursor:pointer;border:none;background:'+tc+';color:'+C.bg+';outline:none;">SUBMIT &#8594;</button>';
-
-  overlay.style.cursor='default';
-  overlay.style.touchAction='auto';
+    '<button id="po-sub" style="'+btnBase+'background:'+tc+';color:'+C.bg+';">SUBMIT &#8594;</button>'+
+    '<div style="flex:1;min-width:12px;"></div>'+
+    buildActionBtns();
 
   setTimeout(function(){
     var ins=[document.getElementById('po-0'),document.getElementById('po-1'),document.getElementById('po-2')];
@@ -292,18 +274,22 @@ function showInitPanel(){
         if(inp.value&&i<2)ins[i+1].focus();
       });
       inp.addEventListener('keydown',function(e){
-        if(e.key==='Backspace'&&!inp.value&&i>0){ins[i-1].focus();}
+        if(e.key==='Backspace'&&!inp.value&&i>0)ins[i-1].focus();
         if(e.key==='Enter')doSubmit(ins);
       });
     });
     var sub=document.getElementById('po-sub');
     if(sub)sub.addEventListener('click',function(){doSubmit(ins);});
+    var again=document.getElementById('po-again');
+    if(again)again.addEventListener('click',restartGame);
     if(ins[0])ins[0].focus();
   },50);
 }
 
 function doSubmit(ins){
-  var name=(ins.map(function(i){return i?i.value.replace(/[^A-Za-z0-9]/g,''):''}).join('')||'AAA').toUpperCase().padEnd(3,'A').slice(0,3);
+  var name=(ins.map(function(i){return i?i.value.replace(/[^A-Za-z0-9]/g,''):''}).join('')).toUpperCase();
+  if(!name)name='???';
+  name=name.padEnd(3,'?').slice(0,3);
   var sub=document.getElementById('po-sub');
   if(sub){sub.textContent='...';sub.disabled=true;}
   phase='submitting';
@@ -323,9 +309,15 @@ function doSubmit(ins){
 }
 
 function finishSubmit(){
-  initPanel.style.display='none';
-  overlay.style.touchAction='none';
-  if(homeBtn&&homeBtn.parentNode)homeBtn.parentNode.style.display='flex';
+  var dc=C.hdr;
+  initPanel.innerHTML=
+    '<div style="font-size:10px;font-weight:500;letter-spacing:.2em;color:'+dc+';text-transform:uppercase;">SCORE SUBMITTED</div>'+
+    '<div style="flex:1;min-width:12px;"></div>'+
+    buildActionBtns();
+  setTimeout(function(){
+    var again=document.getElementById('po-again');
+    if(again)again.addEventListener('click',restartGame);
+  },0);
   phase='leaderboard';
 }
 
