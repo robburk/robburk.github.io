@@ -89,7 +89,7 @@ function selectMode(dark){
   overlay.innerHTML='';
   overlay.style.cssText=[
     'position:fixed','inset:0','z-index:2147483647',
-    'background:'+C.bg,'cursor:none',
+    'background:'+C.bg,
     'user-select:none','-webkit-user-select:none'
   ].join(';');
 
@@ -159,7 +159,7 @@ function restartGame(){
   board=[];myRank=-1;
   if(homeBtn)homeBtn.style.display='none';
   if(initPanel)initPanel.style.display='none';
-  if(overlay){overlay.style.cursor='none';overlay.style.touchAction='none';}
+  if(overlay){overlay.style.touchAction='none';}
   phase='waiting';resetBall(1);
   setTimeout(function(){if(active&&phase==='waiting')phase='playing';},900);
 }
@@ -263,7 +263,6 @@ function doSubmit(ins){
 
 function finishSubmit(){
   initPanel.style.display='none';
-  overlay.style.cursor='none';
   overlay.style.touchAction='none';
   homeBtn.style.display='block';
   phase='leaderboard';
