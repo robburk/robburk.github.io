@@ -58,15 +58,14 @@ function launch(){
   if(active)return;
   active=true;
 
-  // Inject cursor fix - !important beats site's global * { cursor: none }
+  // Hide custom cursor, switch body to native cursor mode
   var cs=document.createElement('style');
   cs.id='rrb-pong-css';
-  cs.textContent='#rrb-pong,#rrb-pong *{cursor:default!important}#rrb-pong button,#rrb-pong a{cursor:pointer!important}';
+  cs.textContent='body.pong-active,body.pong-active *{cursor:auto!important}body.pong-active button,body.pong-active a{cursor:pointer!important}body.pong-active #cursor-dot{display:none!important;pointer-events:none!important}#rrb-pong canvas{pointer-events:none!important}';
   document.head.appendChild(cs);
-
-  // Bring site cursor dot above our overlay
+  document.body.classList.add('pong-active');
   var dot=document.getElementById('cursor-dot');
-  if(dot)dot.style.zIndex='2147483648';
+  if(dot){dot.dataset.prevDisplay=dot.style.display||'';dot.style.display='none';}
 
   // Match current site theme
   var isDark=(document.documentElement.getAttribute('data-theme')||'dark')==='dark';
@@ -181,8 +180,10 @@ function teardown(){
   active=false;phase='idle';
   cancelAnimationFrame(raf);
   window.removeEventListener('resize',resize);
+  // Restore site cursor
+  document.body.classList.remove('pong-active');
   var dot=document.getElementById('cursor-dot');
-  if(dot)dot.style.zIndex='';
+  if(dot){dot.style.display=dot.dataset.prevDisplay||'';delete dot.dataset.prevDisplay;}
   var cs=document.getElementById('rrb-pong-css');
   if(cs)cs.parentNode.removeChild(cs);
   if(overlay&&overlay.parentNode)overlay.parentNode.removeChild(overlay);
