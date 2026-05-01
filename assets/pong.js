@@ -41,6 +41,7 @@ if(params.get('play')==='1'||params.get('pong')==='1'||urlPath.endsWith('/gameov
   window.addEventListener('load',function(){setTimeout(launch,300);});
 }
 document.addEventListener('keydown',function(e){
+  if(e.target&&(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'))return;
   if(e.keyCode===KONAMI[ki]){ki++;if(ki===KONAMI.length){ki=0;launch();return;}}else{ki=0;}
   if(!active){
     kbuf+=(e.key.length===1?e.key.toLowerCase():'');
