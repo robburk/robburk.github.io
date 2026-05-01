@@ -363,11 +363,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function playIn() {
     if (REDUCED) return;
-    const flag = sessionStorage.getItem('pt_in');
-    const at = parseInt(sessionStorage.getItem('pt_at') || '0', 10);
+    // Clear stale session flags (no longer used as a gate — animation
+    // now plays on every page load: first visit, refresh, internal nav).
     sessionStorage.removeItem('pt_in');
     sessionStorage.removeItem('pt_at');
-    if (!flag || (Date.now() - at) > 5000) return;
 
     const overlay = buildOverlay();
     overlay.classList.add('pt-active', 'pt-incoming');

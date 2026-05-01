@@ -1365,6 +1365,11 @@ nav ul li a:hover::after {
   font-size: 0.82rem;
   font-weight: 300;
   line-height: 1.5;
+  /* Hard-lock: row can never grow taller than one line */
+  height: 2.5rem;
+  min-height: 2.5rem;
+  max-height: 2.5rem;
+  box-sizing: border-box;
   overflow: hidden;
   white-space: nowrap;
 }
