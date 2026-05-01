@@ -1385,16 +1385,7 @@ nav ul li a:hover::after {
   border-color: currentColor;
 }
 
-/* subtle random offsets make it feel scattered */
-.sm-b-0 { transform: translateX(3px); }
-.sm-b-1 { transform: translateX(-2px); }
-.sm-b-2 { transform: translateX(5px); }
-.sm-b-3 { transform: translateX(-1px); }
-.sm-b-4 { transform: translateX(4px); }
-.sm-b-5 { transform: translateX(-3px); }
-.sm-b-6 { transform: translateX(2px); }
-.sm-b-7 { transform: translateX(-4px); }
-.sm-b-8 { transform: translateX(1px); }
+/* BEFORE items kept aligned — opacity + ? marker convey unresolved state */
 
 /* ── AFTER column: hidden initially, assembles on scroll ── */
 .sysmap-after .sysmap-item {
