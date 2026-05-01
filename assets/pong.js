@@ -57,34 +57,56 @@ document.addEventListener('keydown',function(e){
 function launch(){
   if(active)return;
   active=true;
+
+  // Inject cursor fix - !important beats site's global * { cursor: none }
+  var cs=document.createElement('style');
+  cs.id='rrb-pong-css';
+  cs.textContent='#rrb-pong,#rrb-pong *{cursor:default!important}#rrb-pong button,#rrb-pong a{cursor:pointer!important}';
+  document.head.appendChild(cs);
+
   // Bring site cursor dot above our overlay
   var dot=document.getElementById('cursor-dot');
   if(dot)dot.style.zIndex='2147483648';
+
+  // Match current site theme
+  var isDark=(document.documentElement.getAttribute('data-theme')||'dark')==='dark';
+  var wBg=isDark?'#0d0d0d':'#f5f5f5';
+  var wEl=isDark?'#f5f5f5':'#0d0d0d';
+  var wGrid=isDark
+    ?'linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px)'
+    :'linear-gradient(rgba(0,0,0,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.04) 1px,transparent 1px)';
+  var wDim=isDark?'rgba(255,255,255,.35)':'rgba(0,0,0,.35)';
+  var wLine=isDark?'rgba(255,255,255,.18)':'rgba(0,0,0,.18)';
+  var wHint=isDark?'rgba(255,255,255,.18)':'rgba(0,0,0,.18)';
+
   overlay=document.createElement('div');
+  overlay.id='rrb-pong';
   overlay.style.cssText=[
     'position:fixed','inset:0','z-index:2147483647',
-    'background:#0d0d0d',
-    'background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px)',
+    'background:'+wBg,
+    'background-image:'+wGrid,
     'background-size:80px 80px',
     'user-select:none','-webkit-user-select:none',
-    'font-family:'+FNT,'color:#f5f5f5',
+    'font-family:'+FNT,'color:'+wEl,
     'opacity:0','transition:opacity .4s'
   ].join(';');
+
   var pad='clamp(32px,6vw,80px)';
   overlay.innerHTML=
     '<div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:'+pad+';overflow:hidden;">'+
-      '<div style="font-size:10px;font-weight:500;letter-spacing:.25em;text-transform:uppercase;opacity:.35;margin-bottom:clamp(14px,2vw,24px);">ROBIN\'S SECRET</div>'+
-      '<div style="font-size:clamp(56px,11vw,160px);font-weight:700;line-height:.88;letter-spacing:-.015em;margin-bottom:clamp(36px,5vw,64px);">PONG.</div>'+
-      '<div style="width:clamp(36px,5vw,56px);height:1px;background:rgba(255,255,255,.18);margin-bottom:clamp(20px,3vw,32px);"></div>'+
-      '<div style="font-size:10px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;opacity:.35;margin-bottom:14px;">SELECT A MODE</div>'+
+      '<div style="font-size:10px;font-weight:500;letter-spacing:.25em;text-transform:uppercase;color:'+wDim+';margin-bottom:clamp(14px,2vw,24px);">ROBIN\'S SECRET</div>'+
+      '<div style="font-size:clamp(56px,11vw,160px);font-weight:700;line-height:.88;letter-spacing:-.015em;color:'+wEl+';margin-bottom:clamp(36px,5vw,64px);">PONG.</div>'+
+      '<div style="width:clamp(36px,5vw,56px);height:1px;background:'+wLine+';margin-bottom:clamp(20px,3vw,32px);"></div>'+
+      '<div style="font-size:10px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:'+wDim+';margin-bottom:14px;">SELECT A MODE</div>'+
       '<div style="display:flex;gap:10px;flex-wrap:wrap;">'+
-        '<button data-mode="dark" style="font-family:'+FNT+';font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;padding:15px 28px;cursor:pointer;border:none;background:#0d0d0d;color:#f5f5f5;outline:1px solid rgba(255,255,255,.28);">DARK &#8594;</button>'+
-        '<button data-mode="light" style="font-family:'+FNT+';font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;padding:15px 28px;cursor:pointer;border:none;background:#f5f5f5;color:#0d0d0d;outline:1px solid rgba(0,0,0,.15);">LIGHT &#8594;</button>'+
+        '<button data-mode="dark" style="font-family:'+FNT+';font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;padding:15px 28px;border:none;background:#0d0d0d;color:#f5f5f5;outline:1px solid rgba(255,255,255,.3);">DARK &#8594;</button>'+
+        '<button data-mode="light" style="font-family:'+FNT+';font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;padding:15px 28px;border:none;background:#f5f5f5;color:#0d0d0d;outline:1px solid rgba(0,0,0,.18);">LIGHT &#8594;</button>'+
       '</div>'+
-      '<div style="position:absolute;bottom:'+pad+';left:'+pad+';font-size:9px;letter-spacing:.18em;opacity:.2;line-height:2;text-transform:uppercase;">'+
+      '<div style="position:absolute;bottom:'+pad+';left:'+pad+';font-size:9px;letter-spacing:.18em;color:'+wHint+';line-height:2;text-transform:uppercase;">'+
         'MOUSE OR TOUCH TO MOVE YOUR PADDLE<br>SURVIVE AS LONG AS YOU CAN - AI WINS AT 7<br>DOUBLE-TAP OR ESC TO EXIT'+
       '</div>'+
     '</div>';
+
   document.body.appendChild(overlay);
   requestAnimationFrame(function(){requestAnimationFrame(function(){overlay.style.opacity='1';});});
   overlay.addEventListener('click',function(e){
@@ -159,9 +181,10 @@ function teardown(){
   active=false;phase='idle';
   cancelAnimationFrame(raf);
   window.removeEventListener('resize',resize);
-  // Restore site cursor dot
   var dot=document.getElementById('cursor-dot');
   if(dot)dot.style.zIndex='';
+  var cs=document.getElementById('rrb-pong-css');
+  if(cs)cs.parentNode.removeChild(cs);
   if(overlay&&overlay.parentNode)overlay.parentNode.removeChild(overlay);
   overlay=cv=ctx=null;
   window.location.href='/';
