@@ -1622,6 +1622,39 @@ nav ul li a:hover::after {
   transform: scaleY(1);
 }
 
+/* THEME-AWARE TILE COLORS
+   Outgoing (cover): tiles = destination page bg (inverse of current).
+   Incoming (uncover): tiles = own page bg (so only the borders show the motion).
+   These line up so the tile color stays continuous across the navigation boundary. */
+
+/* Light page outgoing → going to a dark page → tiles fill dark */
+[data-theme="light"] #page-transition.pt-active:not(.pt-incoming) .pt-tile {
+  background: var(--black);
+  border-right-color: rgba(255, 255, 255, 0.22);
+  border-bottom-color: rgba(255, 255, 255, 0.22);
+}
+
+/* Dark page outgoing → going to a light page → tiles fill light */
+[data-theme="dark"] #page-transition.pt-active:not(.pt-incoming) .pt-tile {
+  background: var(--white);
+  border-right-color: rgba(13, 13, 13, 0.22);
+  border-bottom-color: rgba(13, 13, 13, 0.22);
+}
+
+/* Just landed on a light page → tiles match own light bg */
+[data-theme="light"] #page-transition.pt-incoming .pt-tile {
+  background: var(--white);
+  border-right-color: rgba(13, 13, 13, 0.22);
+  border-bottom-color: rgba(13, 13, 13, 0.22);
+}
+
+/* Just landed on a dark page → tiles match own dark bg */
+[data-theme="dark"] #page-transition.pt-incoming .pt-tile {
+  background: var(--black);
+  border-right-color: rgba(255, 255, 255, 0.22);
+  border-bottom-color: rgba(255, 255, 255, 0.22);
+}
+
 /* Incoming: tiles start covered (origin bottom), then exit downward */
 #page-transition.pt-incoming .pt-tile {
   transform: scaleY(1);
