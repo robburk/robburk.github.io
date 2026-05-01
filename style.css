@@ -784,43 +784,6 @@ footer {
 
 .service-item--minimal p { display: none; }
 
-/* ─── PAGE WIPE TRANSITION ───────────────────────────────── */
-#page-wipe {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 99999;
-  pointer-events: none;
-  will-change: transform;
-}
-
-/* Arrive from left: starts covering, retreats left */
-#page-wipe.wipe-from-left {
-  left: 0;
-  transform: translateX(0);
-}
-#page-wipe.wipe-from-left.wipe-retreat {
-  transform: translateX(-100%);
-  transition: transform 0.7s 0.15s cubic-bezier(0.76, 0, 0.24, 1);
-}
-
-/* Arrive from right: starts covering, retreats right */
-#page-wipe.wipe-from-right {
-  left: 0;
-  transform: translateX(0);
-}
-#page-wipe.wipe-from-right.wipe-retreat {
-  transform: translateX(100%);
-  transition: transform 0.7s 0.15s cubic-bezier(0.76, 0, 0.24, 1);
-}
-
-/* Depart: covers screen */
-#page-wipe.wipe-cover-out {
-  pointer-events: all;
-  transform: translateX(0) !important;
-  transition: transform 0.55s cubic-bezier(0.76, 0, 0.24, 1) !important;
-}
 
 /* ─── CASE STUDY SECTIONS ────────────────────────────────── */
 .case-section {
@@ -1611,3 +1574,61 @@ nav ul li a:hover::after {
   }
 }
 
+/* ─── PAGE TRANSITION: TILE FLIP ───────────────────────── */
+/* Charcoal tiles with ivory hairlines. Fixed colors avoid the invisible-flash
+   problem of using currentColor against pages with similar palettes. */
+#page-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+#page-transition.pt-active {
+  visibility: visible;
+}
+
+.pt-grid {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  grid-template-columns: repeat(var(--pt-cols), 1fr);
+  grid-template-rows: repeat(var(--pt-rows), 1fr);
+}
+
+.pt-tile {
+  background: #151515;
+  border-right: 1px solid rgba(245, 241, 232, 0.18);
+  border-bottom: 1px solid rgba(245, 241, 232, 0.18);
+  transform: scaleY(0);
+  transform-origin: top;
+  will-change: transform;
+}
+
+/* Outgoing: tiles drop in from top, left-to-right column stagger */
+#page-transition.pt-active .pt-tile {
+  transition: transform 380ms cubic-bezier(0.76, 0, 0.24, 1);
+  transition-delay: calc(var(--pt-col) * 22ms);
+}
+
+#page-transition.pt-cover .pt-tile {
+  transform: scaleY(1);
+}
+
+/* Incoming: tiles start covered (origin bottom), then exit downward */
+#page-transition.pt-incoming .pt-tile {
+  transform: scaleY(1);
+  transform-origin: bottom;
+  transition: none;
+}
+
+#page-transition.pt-incoming.pt-uncover .pt-tile {
+  transform: scaleY(0);
+  transition: transform 380ms cubic-bezier(0.76, 0, 0.24, 1);
+  transition-delay: calc((var(--pt-cols) - 1 - var(--pt-col)) * 22ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #page-transition { display: none !important; }
+}

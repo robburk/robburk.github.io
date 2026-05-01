@@ -9,43 +9,6 @@ document.querySelectorAll('.mobile-menu a').forEach(link => {
   });
 });
 
-// ── PAGE WIPE TRANSITION ──────────────────────────────────
-(function () {
-  const wipe = document.createElement('div');
-  wipe.id = 'page-wipe';
-  document.body.appendChild(wipe);
-
-  const lastDir = localStorage.getItem('wipeDir') || 'left';
-  const thisDir = lastDir === 'left' ? 'right' : 'left';
-  localStorage.setItem('wipeDir', thisDir);
-
-  const nextTheme = document.documentElement.getAttribute('data-theme');
-  wipe.style.background = nextTheme === 'dark' ? '#0D0D0D' : '#FFFFFF';
-
-  wipe.classList.add('wipe-cover', `wipe-from-${thisDir}`);
-
-  setTimeout(() => {
-    wipe.classList.add('wipe-retreat');
-  }, 80);
-
-  document.addEventListener('click', e => {
-    const link = e.target.closest('a');
-    if (!link) return;
-    const href = link.getAttribute('href');
-    if (!href || href.startsWith('http') || href.startsWith('mailto') || href.startsWith('#')) return;
-    e.preventDefault();
-
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    wipe.style.background = currentTheme === 'dark' ? '#FFFFFF' : '#0D0D0D';
-
-    wipe.classList.remove('wipe-retreat');
-    wipe.classList.add('wipe-cover-out');
-
-    wipe.addEventListener('transitionend', () => {
-      window.location.href = href;
-    }, { once: true });
-  });
-})();
 
 // ── FADE IN ───────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -325,3 +288,110 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { passive: true });
 })();
 
+// ── PAGE TRANSITION: TILE FLIP (charcoal + ivory hairlines) ─
+// Replaces the old palette wipe. On internal link clicks, the outgoing page
+// covers the screen with a grid of charcoal tiles dropping in from the top,
+// then navigates. The incoming page reads a sessionStorage flag and slides
+// the tiles down out of view. The fixed charcoal color (#151515) avoids the
+// invisible-flash problem where currentColor matched the destination palette.
+(function() {
+  if (typeof window === 'undefined' || !document.body) return;
+
+  const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isMobile = window.matchMedia('(max-width: 800px)').matches;
+  const COLS = isMobile ? 5 : 8;
+  const ROWS = isMobile ? 8 : 6;
+  const TILE_DUR = 380;
+  const COL_STAGGER = 22;
+  const TOTAL = TILE_DUR + (COLS - 1) * COL_STAGGER;
+  const NAV_AT = Math.round(TOTAL * 0.75);
+
+  function buildOverlay() {
+    let el = document.getElementById('page-transition');
+    if (el) return el;
+    el = document.createElement('div');
+    el.id = 'page-transition';
+    el.setAttribute('aria-hidden', 'true');
+    const grid = document.createElement('div');
+    grid.className = 'pt-grid';
+    grid.style.setProperty('--pt-cols', COLS);
+    grid.style.setProperty('--pt-rows', ROWS);
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const tile = document.createElement('div');
+        tile.className = 'pt-tile';
+        tile.style.setProperty('--pt-col', c);
+        grid.appendChild(tile);
+      }
+    }
+    el.appendChild(grid);
+    document.body.appendChild(el);
+    return el;
+  }
+
+  function shouldIntercept(e, link) {
+    if (REDUCED) return false;
+    if (e.button !== 0) return false;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return false;
+    if (!link || !link.href) return false;
+    if (link.target && link.target !== '_self') return false;
+    if (link.hasAttribute('download')) return false;
+    const url = new URL(link.href, window.location.href);
+    if (url.origin !== window.location.origin) return false;
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return false;
+    if (url.pathname === window.location.pathname && url.search === window.location.search && url.hash) return false;
+    if (url.href === window.location.href) return false;
+    return true;
+  }
+
+  function playOut(targetHref) {
+    const overlay = buildOverlay();
+    overlay.classList.remove('pt-incoming', 'pt-uncover');
+    overlay.classList.add('pt-active');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        overlay.classList.add('pt-cover');
+      });
+    });
+    sessionStorage.setItem('pt_in', '1');
+    sessionStorage.setItem('pt_at', String(Date.now()));
+    setTimeout(() => { window.location.href = targetHref; }, NAV_AT);
+    setTimeout(() => {
+      if (window.location.href !== targetHref) window.location.href = targetHref;
+    }, 1500);
+  }
+
+  function playIn() {
+    if (REDUCED) return;
+    const flag = sessionStorage.getItem('pt_in');
+    const at = parseInt(sessionStorage.getItem('pt_at') || '0', 10);
+    sessionStorage.removeItem('pt_in');
+    sessionStorage.removeItem('pt_at');
+    if (!flag || (Date.now() - at) > 5000) return;
+
+    const overlay = buildOverlay();
+    overlay.classList.add('pt-active', 'pt-incoming');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        overlay.classList.add('pt-uncover');
+      });
+    });
+    setTimeout(() => {
+      overlay.classList.remove('pt-active', 'pt-cover', 'pt-incoming', 'pt-uncover');
+    }, TOTAL + 100);
+  }
+
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest && e.target.closest('a[href]');
+    if (!link) return;
+    if (!shouldIntercept(e, link)) return;
+    e.preventDefault();
+    playOut(link.href);
+  });
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', playIn);
+  } else {
+    playIn();
+  }
+})();
