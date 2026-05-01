@@ -324,3 +324,4 @@ document.addEventListener('DOMContentLoaded', () => {
     bar.style.width = (scrolled * 100) + '%';
   }, { passive: true });
 })();
+
