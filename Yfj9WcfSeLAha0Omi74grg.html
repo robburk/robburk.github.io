@@ -18,9 +18,9 @@
     .auth-btn:disabled { cursor: not-allowed !important; }
     input.code-digit { cursor: text !important; }
 
-    .bot-wrap { max-width: 1100px; margin: 0 auto; padding: 5rem 2.5rem 4rem; }
+    .bot-wrap { max-width: 1200px; margin: 0 auto; padding: 5rem 2.5rem 4rem; }
     .bot-eyebrow { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.12em; opacity: 0.5; margin-bottom: 1rem; }
-    .bot-title { font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 700; line-height: 1; letter-spacing: -0.01em; text-transform: uppercase; margin-bottom: 3rem; }
+    .bot-title { font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 700; line-height: 1; letter-spacing: -0.01em; text-transform: uppercase; margin-bottom: 2.5rem; }
 
     /* Auth */
     #auth-screen { max-width: 380px; }
@@ -48,34 +48,125 @@
 
     /* Dashboard */
     #dashboard { display: none; }
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; border: 1px solid currentColor; margin-bottom: 3rem; }
-    .stat-box { padding: 1.25rem 1.5rem; border: 1px solid currentColor; }
-    .stat-label { font-size: 0.62rem; font-weight: 500; letter-spacing: 0.12em; opacity: 0.4; text-transform: uppercase; margin-bottom: 0.4rem; }
-    .stat-value { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; line-height: 1; }
+
+    /* Liveness banner */
+    .live-banner {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 0.9rem 1.25rem;
+      border: 1px solid currentColor;
+      margin-bottom: 1.5rem;
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
+    }
+    .live-dot {
+      display: inline-block;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .live-running .live-dot { background: #22c55e; box-shadow: 0 0 0 4px rgba(34,197,94,0.15); animation: pulse 2s infinite; }
+    .live-stale   .live-dot { background: #f59e0b; }
+    .live-dead    .live-dot { background: #ef4444; }
+    .live-unknown .live-dot { background: #6b7280; }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 4px rgba(34,197,94,0.15); }
+      50%      { box-shadow: 0 0 0 7px rgba(34,197,94,0.05); }
+    }
+    .live-running { border-color: #22c55e; }
+    .live-stale   { border-color: #f59e0b; color: #f59e0b; }
+    .live-dead    { border-color: #ef4444; color: #ef4444; }
+    .live-state { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.08em; font-size: 0.85rem; }
+    .live-meta { margin-left: auto; opacity: 0.6; font-size: 0.7rem; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1px; border: 1px solid currentColor; margin-bottom: 2.5rem; }
+    .stat-box { padding: 1rem 1.25rem; border: 1px solid currentColor; }
+    .stat-label { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.12em; opacity: 0.4; text-transform: uppercase; margin-bottom: 0.4rem; }
+    .stat-value { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; line-height: 1; }
+    .stat-sub { font-size: 0.65rem; opacity: 0.4; margin-top: 0.25rem; }
     .up { color: #22c55e; } .down { color: #ef4444; } .dim { opacity: 0.35; }
-    .section-label { font-size: 0.62rem; font-weight: 500; letter-spacing: 0.12em; opacity: 0.4; text-transform: uppercase; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid currentColor; }
-    .reasoning-box { border: 1px solid currentColor; padding: 1.5rem; margin-bottom: 3rem; }
+
+    .section-label { font-size: 0.62rem; font-weight: 500; letter-spacing: 0.12em; opacity: 0.5; text-transform: uppercase; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid currentColor; display: flex; align-items: center; justify-content: space-between; }
+    .section-label .sublabel { opacity: 0.4; font-weight: 400; letter-spacing: 0.05em; }
+
+    /* Memo */
+    .memo-box {
+      border: 1px solid currentColor;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2.5rem;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      opacity: 0.85;
+    }
+    .memo-empty { opacity: 0.35; font-style: italic; }
+    .memo-meta { font-size: 0.65rem; opacity: 0.4; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid currentColor; letter-spacing: 0.08em; }
+
+    /* Decision detail box */
+    .reasoning-box { border: 1px solid currentColor; padding: 1.5rem; margin-bottom: 2.5rem; }
+    .r-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 2rem; }
     .r-field { margin-bottom: 0.85rem; }
-    .r-key { font-size: 0.62rem; letter-spacing: 0.1em; opacity: 0.35; text-transform: uppercase; margin-bottom: 0.2rem; }
-    .r-val { font-size: 0.88rem; line-height: 1.6; }
-    .badge { display: inline-block; padding: 0.1rem 0.45rem; font-size: 0.62rem; font-weight: 500; letter-spacing: 0.07em; border: 1px solid currentColor; text-transform: uppercase; }
+    .r-field.full { grid-column: 1 / -1; }
+    .r-key { font-size: 0.6rem; letter-spacing: 0.1em; opacity: 0.35; text-transform: uppercase; margin-bottom: 0.25rem; }
+    .r-val { font-size: 0.85rem; line-height: 1.55; }
+    .badge { display: inline-block; padding: 0.15rem 0.5rem; font-size: 0.6rem; font-weight: 500; letter-spacing: 0.08em; border: 1px solid currentColor; text-transform: uppercase; }
     .badge-g { border-color: #22c55e; color: #22c55e; }
     .badge-r { border-color: #ef4444; color: #ef4444; }
-    .badge-dim { opacity: 0.35; }
-    .log-table { width: 100%; border-collapse: collapse; font-size: 0.76rem; }
-    .log-table th { font-size: 0.6rem; letter-spacing: 0.1em; opacity: 0.35; text-transform: uppercase; text-align: left; padding: 0.45rem 0.6rem; border-bottom: 1px solid currentColor; }
+    .badge-a { border-color: #f59e0b; color: #f59e0b; }
+    .badge-dim { opacity: 0.4; }
+
+    /* Debate breakdown — bull vs bear side by side */
+    .debate-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid currentColor;
+    }
+    .debate-col {
+      padding: 0.85rem 1rem;
+      border: 1px solid currentColor;
+    }
+    .debate-col.bull { border-color: #22c55e; }
+    .debate-col.bear { border-color: #ef4444; }
+    .debate-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.5rem; }
+    .debate-name { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; }
+    .debate-conf { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; }
+    .debate-text { font-size: 0.75rem; line-height: 1.55; opacity: 0.75; }
+    .debate-col.bull .debate-name, .debate-col.bull .debate-conf { color: #22c55e; }
+    .debate-col.bear .debate-name, .debate-col.bear .debate-conf { color: #ef4444; }
+
+    /* Per-coin table */
+    .perf-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; margin-bottom: 2.5rem; }
+    .perf-table th { font-size: 0.58rem; letter-spacing: 0.1em; opacity: 0.4; text-transform: uppercase; text-align: left; padding: 0.5rem 0.6rem; border-bottom: 1px solid currentColor; }
+    .perf-table td { padding: 0.55rem 0.6rem; border-bottom: 1px solid currentColor; opacity: 0.85; }
+    .perf-table tr:hover td { opacity: 1; }
+    .perf-table .num { text-align: right; font-feature-settings: "tnum"; }
+    .perf-empty { padding: 1rem; opacity: 0.35; font-style: italic; }
+    .perf-downgraded { color: #f59e0b; }
+
+    /* Decision log */
+    .log-table { width: 100%; border-collapse: collapse; font-size: 0.74rem; }
+    .log-table th { font-size: 0.58rem; letter-spacing: 0.1em; opacity: 0.4; text-transform: uppercase; text-align: left; padding: 0.45rem 0.6rem; border-bottom: 1px solid currentColor; }
     .log-table td { padding: 0.55rem 0.6rem; border-bottom: 1px solid currentColor; opacity: 0.8; vertical-align: top; }
     .log-table tr:hover td { opacity: 1; }
     .act-buy { color: #22c55e; font-weight: 600; }
     .act-sell { color: #ef4444; font-weight: 600; }
     .act-no { opacity: 0.3; }
+    .act-hb { opacity: 0.3; font-style: italic; }
     .refresh-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
-    .last-updated { font-size: 0.68rem; opacity: 0.35; }
-    .btn-sm { padding: 0.6rem 1rem; background: transparent; border: 1px solid currentColor; font-family: var(--font-body); font-size: 0.62rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; color: inherit; transition: opacity 0.2s; }
+    .last-updated { font-size: 0.68rem; opacity: 0.4; }
+    .btn-sm { padding: 0.55rem 1rem; background: transparent; border: 1px solid currentColor; font-family: var(--font-body); font-size: 0.62rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; color: inherit; transition: opacity 0.2s; }
     .btn-sm:hover { opacity: 0.6; }
     .warn { color: #f59e0b; font-size: 0.68rem; }
     .score-bar { display: inline-block; width: 40px; height: 4px; background: currentColor; opacity: 0.15; vertical-align: middle; position: relative; }
     .score-fill { position: absolute; left: 0; top: 0; height: 100%; background: #22c55e; opacity: 1; }
+
+    @media (max-width: 700px) {
+      .r-grid { grid-template-columns: 1fr; }
+      .debate-grid { grid-template-columns: 1fr; }
+      .live-meta { display: none; }
+    }
   </style>
 </head>
 <body>
@@ -121,34 +212,76 @@
 
         <div class="refresh-row">
           <div class="last-updated" id="last-updated">Loading...</div>
-          <div style="display:flex;gap:0.75rem;">
+          <div style="display:flex;gap:0.6rem;">
             <button class="btn-sm" onclick="fetchData()">REFRESH</button>
             <button class="btn-sm" onclick="logout()">LOG OUT</button>
           </div>
         </div>
 
-        <div class="stats-grid">
-          <div class="stat-box"><div class="stat-label">Status</div><div class="stat-value" id="s-status">—</div></div>
-          <div class="stat-box"><div class="stat-label">Total Events</div><div class="stat-value" id="s-total">—</div></div>
-          <div class="stat-box"><div class="stat-label">Trades</div><div class="stat-value up" id="s-trades">—</div></div>
-          <div class="stat-box"><div class="stat-label">Blocked</div><div class="stat-value" id="s-blocked">—</div></div>
-          <div class="stat-box"><div class="stat-label">No-Trade</div><div class="stat-value dim" id="s-notrade">—</div></div>
-          <div class="stat-box"><div class="stat-label">Last Symbol</div><div class="stat-value" id="s-symbol">—</div></div>
-          <div class="stat-box"><div class="stat-label">Confidence</div><div class="stat-value" id="s-conf">—</div></div>
-          <div class="stat-box"><div class="stat-label">Last Action</div><div class="stat-value" id="s-action">—</div></div>
+        <!-- Liveness banner -->
+        <div class="live-banner live-unknown" id="live-banner">
+          <span class="live-dot"></span>
+          <span class="live-state" id="live-state">CONNECTING</span>
+          <span class="live-meta" id="live-meta">—</span>
         </div>
 
-        <div class="section-label">LAST CLAUDE REASONING</div>
-        <div class="reasoning-box" id="reasoning-box"><div style="opacity:0.3">Loading...</div></div>
+        <!-- Top stats -->
+        <div class="stats-grid">
+          <div class="stat-box"><div class="stat-label">Equity</div><div class="stat-value" id="s-equity">—</div><div class="stat-sub" id="s-equity-sub"></div></div>
+          <div class="stat-box"><div class="stat-label">Cash</div><div class="stat-value" id="s-cash">—</div></div>
+          <div class="stat-box"><div class="stat-label">Trades Today</div><div class="stat-value" id="s-trades-today">—</div><div class="stat-sub">Max 3/day</div></div>
+          <div class="stat-box"><div class="stat-label">Cons. Losses</div><div class="stat-value" id="s-losses">—</div></div>
+          <div class="stat-box"><div class="stat-label">Fear &amp; Greed</div><div class="stat-value" id="s-fg">—</div><div class="stat-sub" id="s-fg-sub"></div></div>
+          <div class="stat-box"><div class="stat-label">News</div><div class="stat-value" id="s-sent" style="font-size:1.1rem;">—</div></div>
+        </div>
 
-        <div class="section-label" style="margin-top:3rem;">DECISION LOG — LAST 50</div>
+        <!-- Activity grid -->
+        <div class="stats-grid">
+          <div class="stat-box"><div class="stat-label">Total Events</div><div class="stat-value" id="s-total">—</div></div>
+          <div class="stat-box"><div class="stat-label">Trades</div><div class="stat-value up" id="s-tx">—</div></div>
+          <div class="stat-box"><div class="stat-label">Blocked</div><div class="stat-value" id="s-blocked">—</div></div>
+          <div class="stat-box"><div class="stat-label">No-Trade</div><div class="stat-value dim" id="s-notrade">—</div></div>
+          <div class="stat-box"><div class="stat-label">Last Symbol</div><div class="stat-value" id="s-symbol" style="font-size:1.2rem;">—</div></div>
+          <div class="stat-box"><div class="stat-label">Last Action</div><div class="stat-value" id="s-action" style="font-size:1.1rem;">—</div></div>
+        </div>
+
+        <!-- Strategy memo -->
+        <div class="section-label">
+          STRATEGY MEMO
+          <span class="sublabel" id="memo-meta">—</span>
+        </div>
+        <div class="memo-box" id="memo-box"><div class="memo-empty">No reflection has run yet. The bot generates a strategy memo every 24 hours after observing decisions.</div></div>
+
+        <!-- Last decision detail with debate breakdown -->
+        <div class="section-label">LAST DECISION</div>
+        <div class="reasoning-box" id="reasoning-box"><div class="dim">No decisions yet. The bot only logs when a coin triggers (ATR move, RSI extreme, or volume spike).</div></div>
+
+        <!-- Per-coin performance -->
+        <div class="section-label">PER-COIN PERFORMANCE</div>
+        <div style="overflow-x:auto; margin-bottom:2.5rem;">
+          <table class="perf-table">
+            <thead><tr>
+              <th>SYMBOL</th>
+              <th class="num">TRADES</th>
+              <th class="num">WIN RATE</th>
+              <th class="num">NET %</th>
+              <th class="num">REJECTED</th>
+              <th class="num">SHADOW W/L</th>
+              <th>STATUS</th>
+            </tr></thead>
+            <tbody id="perf-body"><tr><td colspan="7" class="perf-empty">No performance data yet.</td></tr></tbody>
+          </table>
+        </div>
+
+        <!-- Decision log -->
+        <div class="section-label">DECISION LOG — LAST 50</div>
         <div style="overflow-x:auto;">
           <table class="log-table">
             <thead><tr>
               <th>TIME (UTC)</th><th>SYMBOL</th><th>SCORE</th><th>TRIGGER</th>
               <th>CLAUDE</th><th>CONF</th><th>RISK</th><th>TAKEN</th><th>FLAGS</th>
             </tr></thead>
-            <tbody id="log-body"><tr><td colspan="9" style="opacity:0.3">Loading...</td></tr></tbody>
+            <tbody id="log-body"><tr><td colspan="9" class="dim">Loading...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -160,6 +293,8 @@
     const API = "https://worker-production-d8b2.up.railway.app";
     let _token = null;
     let _refreshTimer = null;
+    let _memoCounter = 0;        // memo fetches every Nth tick
+    let _perfCounter = 0;        // perf fetches every Nth tick
 
     // ── Auto-advance digit inputs ─────────────────────────────────
     document.querySelectorAll(".code-digit").forEach((el, i, all) => {
@@ -182,7 +317,6 @@
       });
     });
 
-    // Auto-focus first digit on load
     window.addEventListener("DOMContentLoaded", () => {
       const saved = sessionStorage.getItem("bot_token");
       if (saved) { _token = saved; showDashboard(); }
@@ -237,56 +371,223 @@
     function showDashboard() {
       document.getElementById("auth-screen").style.display = "none";
       document.getElementById("dashboard").style.display  = "block";
-      fetchData();
-      _refreshTimer = setInterval(fetchData, 30000);
+      fetchData(true);
+      _refreshTimer = setInterval(() => fetchData(false), 30000);
     }
 
     // ── Data ──────────────────────────────────────────────────────
-    async function fetchData() {
+    async function fetchData(initial) {
       if (!_token) return;
+
+      // Always fetch status + log. Memo and perf less often.
+      const fetches = [
+        fetch(`${API}/api/status?token=${_token}`).then(r => r),
+        fetch(`${API}/api/log?token=${_token}`).then(r => r),
+      ];
+      const wantMemo = initial || (_memoCounter++ % 10 === 0);  // ~ every 5min
+      const wantPerf = initial || (_perfCounter++ % 2 === 0);   // ~ every minute
+      if (wantMemo) fetches.push(fetch(`${API}/api/memo?token=${_token}`).then(r => r));
+      if (wantPerf) fetches.push(fetch(`${API}/api/performance?token=${_token}`).then(r => r));
+
       try {
-        const [sRes, lRes] = await Promise.all([
-          fetch(`${API}/api/status?token=${_token}`),
-          fetch(`${API}/api/log?token=${_token}`)
-        ]);
-        if (sRes.status === 401 || lRes.status === 401) { logout(); return; }
-        const status = await sRes.json();
-        const log    = await lRes.json();
-        renderStatus(status, log);
+        const responses = await Promise.all(fetches);
+        if (responses.some(r => r.status === 401)) { logout(); return; }
+
+        const status = await responses[0].json();
+        const log    = await responses[1].json();
+        let memo = null, perf = null;
+        let idx = 2;
+        if (wantMemo) memo = await responses[idx++].json();
+        if (wantPerf) perf = await responses[idx++].json();
+
+        renderLive(status);
+        renderStats(status, log);
+        renderLastDecision(log.entries || []);
         renderLog(log.entries || []);
+        if (memo) renderMemo(memo);
+        if (perf) renderPerf(perf);
+
         document.getElementById("last-updated").textContent =
           "Refreshed " + new Date().toLocaleTimeString();
       } catch(e) {
         document.getElementById("last-updated").textContent = "Connection error — retrying...";
+        setLive("unknown", "OFFLINE", "Connection error");
       }
     }
 
-    function renderStatus(status, log) {
-      document.getElementById("s-status").textContent  = status.status || "—";
+    // ── Renderers ─────────────────────────────────────────────────
+    function setLive(cls, label, meta) {
+      const banner = document.getElementById("live-banner");
+      banner.className = "live-banner live-" + cls;
+      document.getElementById("live-state").textContent = label;
+      document.getElementById("live-meta").textContent = meta || "";
+    }
+
+    function renderLive(status) {
+      const state = (status.status || "UNKNOWN").toUpperCase();
+      const age = status.heartbeat_age_seconds;
+      let cls = "unknown", label = state, meta = "";
+      if (state === "RUNNING") { cls = "running"; label = "RUNNING"; }
+      else if (state === "STALE") { cls = "stale"; label = "STALE"; }
+      else if (state === "DEAD")  { cls = "dead"; label = "DEAD"; }
+      else if (state === "NO_HEARTBEAT") { cls = "unknown"; label = "WAITING FOR FIRST HEARTBEAT"; }
+
+      if (age != null) {
+        const ago = age < 60 ? `${age}s ago` : age < 3600 ? `${Math.floor(age/60)}m ago` : `${Math.floor(age/3600)}h ago`;
+        meta = `Last heartbeat ${ago} · Watchlist ${status.watchlist_size ?? "?"} · Active ${status.active_data_count ?? "?"}`;
+      }
+      setLive(cls, label, meta);
+    }
+
+    function fmtMoney(v) {
+      if (v == null) return "—";
+      const n = parseFloat(v);
+      if (isNaN(n)) return "—";
+      return "$" + n.toLocaleString(undefined, {maximumFractionDigits: 0});
+    }
+
+    function renderStats(status, log) {
+      document.getElementById("s-equity").textContent = fmtMoney(status.account_equity);
+      const cash = status.account_cash, eq = status.account_equity;
+      if (cash != null && eq && eq > 0) {
+        document.getElementById("s-equity-sub").textContent = `${Math.round(100*cash/eq)}% in cash`;
+      }
+      document.getElementById("s-cash").textContent = fmtMoney(status.account_cash);
+      document.getElementById("s-trades-today").textContent = status.trades_today ?? "—";
+      document.getElementById("s-losses").textContent = status.consecutive_losses ?? "—";
+      document.getElementById("s-fg").textContent = status.fear_greed ?? "—";
+
+      // Fear & greed label
+      const fg = status.fear_greed;
+      let fgLabel = "";
+      if (fg != null) {
+        if (fg < 25) fgLabel = "Extreme Fear";
+        else if (fg < 45) fgLabel = "Fear";
+        else if (fg < 55) fgLabel = "Neutral";
+        else if (fg < 75) fgLabel = "Greed";
+        else fgLabel = "Extreme Greed";
+      }
+      document.getElementById("s-fg-sub").textContent = fgLabel;
+
+      const sent = status.news_sentiment || "—";
+      const sentEl = document.getElementById("s-sent");
+      sentEl.textContent = sent;
+      sentEl.className = "stat-value " + (sent === "BULLISH" ? "up" : sent === "BEARISH" ? "down" : "dim");
+
+      // Activity grid
       document.getElementById("s-total").textContent   = log.total ?? "—";
-      document.getElementById("s-trades").textContent  = log.trades ?? "—";
+      document.getElementById("s-tx").textContent      = log.trades ?? "—";
       document.getElementById("s-blocked").textContent = log.blocked ?? "—";
       document.getElementById("s-notrade").textContent = log.no_trades ?? "—";
       document.getElementById("s-symbol").textContent  = status.last_symbol || "—";
-      document.getElementById("s-conf").textContent    = status.last_confidence
-        ? (status.last_confidence * 100).toFixed(0) + "%" : "—";
       document.getElementById("s-action").textContent  = status.last_action || "—";
+    }
 
-      const entries = log.entries || [];
+    function renderMemo(memo) {
+      const box = document.getElementById("memo-box");
+      const meta = document.getElementById("memo-meta");
+      if (memo && memo.memo) {
+        box.textContent = memo.memo;
+        const gen = memo.generated_at ? new Date(memo.generated_at).toLocaleString() : "—";
+        meta.textContent = `Generated ${gen} · ${memo.decisions_reviewed || 0} decisions reviewed`;
+      } else {
+        box.innerHTML = `<div class="memo-empty">No reflection has run yet. The bot generates a strategy memo every 24 hours after observing decisions.</div>`;
+        meta.textContent = "Pending first daily cycle";
+      }
+    }
+
+    function renderLastDecision(entries) {
+      const box = document.getElementById("reasoning-box");
+      if (!entries.length) {
+        box.innerHTML = `<div class="dim">No decisions yet. The bot only logs when a coin triggers (ATR move, RSI extreme, or volume spike).</div>`;
+        return;
+      }
       const last = entries[entries.length - 1];
-      if (!last) { document.getElementById("reasoning-box").innerHTML = "<div style='opacity:.3'>No decisions yet.</div>"; return; }
       const c = last.claude || {}, r = last.risk || {};
+      const debate = c._debate || {};
       const ac = c.action === "BUY" ? "badge-g" : c.action === "SELL" ? "badge-r" : "badge-dim";
-      document.getElementById("reasoning-box").innerHTML = `
-        <div class="r-field"><div class="r-key">Symbol</div><div class="r-val">${last.symbol || "—"} &nbsp; <span style="opacity:.4;font-size:.75rem">${(last.trigger||"").slice(0,40)}</span></div></div>
-        <div class="r-field"><div class="r-key">Setup Score</div><div class="r-val">${last.setup_score != null ? (last.setup_score * 100).toFixed(1) + "%" : "—"} ${last.is_broad_market ? '<span class="badge badge-dim">BROAD MARKET</span>' : ""}</div></div>
-        <div class="r-field"><div class="r-key">Claude Decision</div><div class="r-val"><span class="badge ${ac}">${c.action||"—"}</span> &nbsp; ${c.confidence != null ? (c.confidence*100).toFixed(0)+"% confidence" : ""}</div></div>
-        <div class="r-field"><div class="r-key">Thesis</div><div class="r-val">${c.thesis||"—"}</div></div>
-        <div class="r-field"><div class="r-key">Invalidation</div><div class="r-val">${c.invalidation||"—"}</div></div>
-        <div class="r-field"><div class="r-key">No-Trade Reason</div><div class="r-val">${c.no_trade_reason||"—"}</div></div>
-        <div class="r-field"><div class="r-key">Risk Engine</div><div class="r-val">${r.approved ? '<span class="badge badge-g">APPROVED</span>' : '<span class="badge badge-r">BLOCKED</span>'} &nbsp; <span style="opacity:.5;font-size:.75rem">${(r.reasons||[]).slice(0,3).join(" · ")}</span></div></div>
-        ${c.warning_flags?.length ? `<div class="r-field"><div class="r-key">Warnings</div><div class="r-val warn">${c.warning_flags.join(" · ")}</div></div>` : ""}
-      `;
+
+      let html = `<div class="r-grid">
+        <div class="r-field">
+          <div class="r-key">Symbol &amp; Trigger</div>
+          <div class="r-val"><strong>${esc(last.symbol || "—")}</strong> <span style="opacity:.5;font-size:.75rem;margin-left:.5rem;">${esc((last.trigger||"").slice(0,60))}</span></div>
+        </div>
+        <div class="r-field">
+          <div class="r-key">Setup Score</div>
+          <div class="r-val">${last.setup_score != null ? (last.setup_score * 100).toFixed(1) + "%" : "—"} ${last.is_broad_market ? '<span class="badge badge-a" style="margin-left:.5rem">BROAD MARKET</span>' : ""}</div>
+        </div>
+        <div class="r-field">
+          <div class="r-key">Claude Decision</div>
+          <div class="r-val"><span class="badge ${ac}">${esc(c.action||"—")}</span> ${c.confidence != null ? `<span style="margin-left:.5rem">${(c.confidence*100).toFixed(0)}% confidence</span>` : ""} ${c.verdict ? `<span style="opacity:.5;margin-left:.5rem;font-size:.75rem">${esc(c.verdict)}</span>` : ""}</div>
+        </div>
+        <div class="r-field">
+          <div class="r-key">Risk Engine</div>
+          <div class="r-val">${r.approved ? '<span class="badge badge-g">APPROVED</span>' : '<span class="badge badge-r">BLOCKED</span>'} <span style="opacity:.5;font-size:.72rem;margin-left:.5rem">${esc((r.reasons||[]).slice(0,3).join(" · "))}</span></div>
+        </div>
+        <div class="r-field full">
+          <div class="r-key">Thesis</div>
+          <div class="r-val">${esc(c.thesis || "—")}</div>
+        </div>
+        ${c.invalidation ? `<div class="r-field full"><div class="r-key">Invalidation</div><div class="r-val">${esc(c.invalidation)}</div></div>` : ""}
+        ${c.no_trade_reason ? `<div class="r-field full"><div class="r-key">No-Trade Reason</div><div class="r-val">${esc(c.no_trade_reason)}</div></div>` : ""}
+        ${c.warning_flags && c.warning_flags.length ? `<div class="r-field full"><div class="r-key">Warnings</div><div class="r-val warn">${esc(c.warning_flags.join(" · "))}</div></div>` : ""}
+      </div>`;
+
+      // Debate breakdown if available
+      if (debate.bull_confidence != null || debate.bear_confidence != null) {
+        const bc = debate.bull_confidence != null ? (debate.bull_confidence*100).toFixed(0) + "%" : "—";
+        const bec = debate.bear_confidence != null ? (debate.bear_confidence*100).toFixed(0) + "%" : "—";
+        html += `<div class="debate-grid">
+          <div class="debate-col bull">
+            <div class="debate-head">
+              <span class="debate-name">Bull Case</span>
+              <span class="debate-conf">${bc}</span>
+            </div>
+            <div class="debate-text">${esc(debate.bull_summary || "No bull summary captured.")}</div>
+          </div>
+          <div class="debate-col bear">
+            <div class="debate-head">
+              <span class="debate-name">Bear Case</span>
+              <span class="debate-conf">${bec}</span>
+            </div>
+            <div class="debate-text">${esc(debate.bear_summary || "No bear summary captured.")}</div>
+          </div>
+        </div>`;
+      }
+
+      box.innerHTML = html;
+    }
+
+    function renderPerf(perf) {
+      const tbody = document.getElementById("perf-body");
+      const coins = perf.coins || {};
+      const entries = Object.entries(coins);
+      if (!entries.length) {
+        tbody.innerHTML = `<tr><td colspan="7" class="perf-empty">No completed trades yet. Stats appear after the first trade closes.</td></tr>`;
+        return;
+      }
+      entries.sort((a,b) => (b[1].trades || 0) - (a[1].trades || 0));
+      tbody.innerHTML = entries.map(([sym, c]) => {
+        const wr = c.win_rate != null ? (c.win_rate * 100).toFixed(0) + "%" : "—";
+        const wrCls = c.win_rate == null ? "dim" : c.win_rate >= 0.5 ? "up" : "down";
+        const net = c.net_pct != null ? (c.net_pct >= 0 ? "+" : "") + c.net_pct.toFixed(2) + "%" : "—";
+        const netCls = c.net_pct == null ? "dim" : c.net_pct >= 0 ? "up" : "down";
+        const shadow = `${c.shadow_would_have_won || 0}W / ${c.shadow_would_have_lost || 0}L`;
+        const status = c.downgraded
+          ? '<span class="badge badge-a perf-downgraded">DOWNGRADED</span>'
+          : c.trades >= 10
+            ? '<span class="badge badge-g">ACTIVE</span>'
+            : '<span class="badge badge-dim">WARMING UP</span>';
+        return `<tr>
+          <td><strong>${esc(sym)}</strong></td>
+          <td class="num">${c.trades || 0}</td>
+          <td class="num ${wrCls}">${wr}</td>
+          <td class="num ${netCls}">${net}</td>
+          <td class="num">${c.rejected_signals || 0}</td>
+          <td class="num" style="opacity:.6">${shadow}</td>
+          <td>${status}</td>
+        </tr>`;
+      }).join("");
     }
 
     function scoreBar(score) {
@@ -297,23 +598,34 @@
 
     function renderLog(entries) {
       const tbody = document.getElementById("log-body");
-      if (!entries.length) { tbody.innerHTML = "<tr><td colspan='9' style='opacity:.3'>No decisions logged yet.</td></tr>"; return; }
+      if (!entries.length) {
+        tbody.innerHTML = "<tr><td colspan='9' class='dim'>No decisions logged yet.</td></tr>";
+        return;
+      }
       tbody.innerHTML = [...entries].reverse().slice(0,50).map(e => {
         const c = e.claude || {}, r = e.risk || {};
         const ac = c.action === "BUY" ? "act-buy" : c.action === "SELL" ? "act-sell" : "act-no";
-        const tc = (e.action_taken && !["NO_ACTION","BLOCKED","SKIPPED",""].includes(e.action_taken)) ? "act-buy" : "act-no";
+        const taken = e.action_taken || "—";
+        const tc = (taken && !["NO_ACTION","BLOCKED","SKIPPED",""].includes(taken)) ? "act-buy" : "act-no";
         return `<tr>
-          <td>${(e.timestamp||"").slice(0,19).replace("T"," ")}</td>
-          <td>${e.symbol||"—"}</td>
+          <td>${esc((e.timestamp||"").slice(0,19).replace("T"," "))}</td>
+          <td>${esc(e.symbol||"—")}</td>
           <td>${scoreBar(e.setup_score)}</td>
-          <td style="max-width:140px;word-break:break-word;font-size:.68rem">${(e.trigger||"—").slice(0,35)}</td>
-          <td class="${ac}">${c.action||"—"}</td>
+          <td style="max-width:160px;word-break:break-word;font-size:.68rem">${esc((e.trigger||"—").slice(0,40))}</td>
+          <td class="${ac}">${esc(c.action||"—")}</td>
           <td>${c.confidence != null ? (c.confidence*100).toFixed(0)+"%" : "—"}</td>
           <td>${r.approved ? '<span class="badge badge-g" style="font-size:.55rem">OK</span>' : '<span class="badge badge-r" style="font-size:.55rem">BLK</span>'}</td>
-          <td class="${tc}">${(e.action_taken||"—").slice(0,12)}</td>
-          <td class="warn" style="font-size:.62rem;max-width:150px;word-break:break-word">${(c.warning_flags||[]).join(", ")}</td>
+          <td class="${tc}">${esc(taken.slice(0,14))}</td>
+          <td class="warn" style="font-size:.62rem;max-width:170px;word-break:break-word">${esc((c.warning_flags||[]).join(", "))}</td>
         </tr>`;
       }).join("");
+    }
+
+    function esc(s) {
+      if (s == null) return "";
+      return String(s).replace(/[&<>"']/g, ch => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[ch]));
     }
 
     function toggleMenu() { document.getElementById("mobileMenu")?.classList.toggle("open"); }
