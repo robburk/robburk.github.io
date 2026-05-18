@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RRB</title>
+  <link rel="stylesheet" href="style.css?v18">
+  <link rel="preconnect" href="https://use.typekit.net" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
+  <link rel="stylesheet" href="https://use.typekit.net/lnt1dnh.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script>!function(){var l=localStorage.getItem("theme")||"light",n=l==="light"?"dark":"light";document.documentElement.setAttribute("data-theme",n);localStorage.setItem("theme",n);}();</script>
+  <style>
+    .bot-wrap { max-width: 1100px; margin: 0 auto; padding: 5rem 2.5rem 4rem; }
+    .bot-eyebrow { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.12em; opacity: 0.5; margin-bottom: 1rem; }
+    .bot-title { font-family: var(--font-display); font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 700; line-height: 1; letter-spacing: -0.01em; text-transform: uppercase; margin-bottom: 3rem; }
+
+    /* Auth */
+    #auth-screen { max-width: 380px; }
+    .auth-sub { font-size: 0.82rem; opacity: 0.55; margin-bottom: 2rem; line-height: 1.7; }
+    .code-input-wrap { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+    .code-digit {
+      width: 48px; height: 60px; text-align: center; font-size: 1.4rem;
+      font-family: var(--font-display); font-weight: 700;
+      border: 1px solid currentColor; background: transparent; color: inherit;
+      outline: none; transition: border-width 0.1s;
+    }
+    .code-digit:focus { border-width: 2px; }
+    .auth-btn {
+      width: 100%; padding: 1rem; background: currentColor;
+      border: 1px solid currentColor; font-family: var(--font-body);
+      font-size: 0.7rem; font-weight: 500; letter-spacing: 0.12em;
+      text-transform: uppercase; cursor: pointer; transition: opacity 0.2s;
+    }
+    [data-theme="light"] .auth-btn { color: var(--white); }
+    [data-theme="dark"]  .auth-btn { color: var(--black); }
+    .auth-btn:hover { opacity: 0.7; }
+    .auth-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    #auth-error { font-size: 0.72rem; color: #ef4444; margin-top: 0.75rem; display: none; }
+    #auth-hint { font-size: 0.68rem; opacity: 0.4; margin-top: 1rem; }
+
+    /* Dashboard */
+    #dashboard { display: none; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1px; border: 1px solid currentColor; margin-bottom: 3rem; }
+    .stat-box { padding: 1.25rem 1.5rem; border: 1px solid currentColor; }
+    .stat-label { font-size: 0.62rem; font-weight: 500; letter-spacing: 0.12em; opacity: 0.4; text-transform: uppercase; margin-bottom: 0.4rem; }
+    .stat-value { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; line-height: 1; }
+    .up { color: #22c55e; } .down { color: #ef4444; } .dim { opacity: 0.35; }
+    .section-label { font-size: 0.62rem; font-weight: 500; letter-spacing: 0.12em; opacity: 0.4; text-transform: uppercase; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid currentColor; }
+    .reasoning-box { border: 1px solid currentColor; padding: 1.5rem; margin-bottom: 3rem; }
+    .r-field { margin-bottom: 0.85rem; }
+    .r-key { font-size: 0.62rem; letter-spacing: 0.1em; opacity: 0.35; text-transform: uppercase; margin-bottom: 0.2rem; }
+    .r-val { font-size: 0.88rem; line-height: 1.6; }
+    .badge { display: inline-block; padding: 0.1rem 0.45rem; font-size: 0.62rem; font-weight: 500; letter-spacing: 0.07em; border: 1px solid currentColor; text-transform: uppercase; }
+    .badge-g { border-color: #22c55e; color: #22c55e; }
+    .badge-r { border-color: #ef4444; color: #ef4444; }
+    .badge-dim { opacity: 0.35; }
+    .log-table { width: 100%; border-collapse: collapse; font-size: 0.76rem; }
+    .log-table th { font-size: 0.6rem; letter-spacing: 0.1em; opacity: 0.35; text-transform: uppercase; text-align: left; padding: 0.45rem 0.6rem; border-bottom: 1px solid currentColor; }
+    .log-table td { padding: 0.55rem 0.6rem; border-bottom: 1px solid currentColor; opacity: 0.8; vertical-align: top; }
+    .log-table tr:hover td { opacity: 1; }
+    .act-buy { color: #22c55e; font-weight: 600; }
+    .act-sell { color: #ef4444; font-weight: 600; }
+    .act-no { opacity: 0.3; }
+    .refresh-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+    .last-updated { font-size: 0.68rem; opacity: 0.35; }
+    .btn-sm { padding: 0.6rem 1rem; background: transparent; border: 1px solid currentColor; font-family: var(--font-body); font-size: 0.62rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; color: inherit; transition: opacity 0.2s; }
+    .btn-sm:hover { opacity: 0.6; }
+    .warn { color: #f59e0b; font-size: 0.68rem; }
+    .score-bar { display: inline-block; width: 40px; height: 4px; background: currentColor; opacity: 0.15; vertical-align: middle; position: relative; }
+    .score-fill { position: absolute; left: 0; top: 0; height: 100%; background: #22c55e; opacity: 1; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="index.html" class="logo">
+      <picture><source srcset="assets/logo.webp" type="image/webp"><img src="assets/logo.png" alt="RRB" width="94" height="56"></picture>
+    </a>
+    <ul>
+      <li><a href="governance.html">DIGITAL GOVERNANCE</a></li>
+      <li><a href="services.html">SERVICES</a></li>
+      <li><a href="case-studies.html">CASE STUDIES</a></li>
+      <li><a href="about.html">ABOUT</a></li>
+      <li><a href="contact.html">CONTACT</a></li>
+    </ul>
+    <button class="menu-toggle" onclick="toggleMenu()">&#9776;</button>
+  </nav>
+
+  <main>
+    <div class="bot-wrap">
+
+      <!-- AUTH SCREEN -->
+      <div id="auth-screen">
+        <div class="bot-eyebrow">PRIVATE ACCESS</div>
+        <h1 class="bot-title">TRADING<br>BOT.</h1>
+        <p class="auth-sub">Enter the 6-digit code from your authenticator app.</p>
+        <div class="code-input-wrap" id="code-inputs">
+          <input class="code-digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]">
+          <input class="code-digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]">
+          <input class="code-digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]">
+          <input class="code-digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]">
+          <input class="code-digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]">
+          <input class="code-digit" type="tel" maxlength="1" inputmode="numeric" pattern="[0-9]">
+        </div>
+        <button class="auth-btn" id="auth-btn" onclick="submitCode()">VERIFY &rarr;</button>
+        <div id="auth-error">Invalid code. Try again.</div>
+        <div id="auth-hint">Code rotates every 30 seconds.</div>
+      </div>
+
+      <!-- DASHBOARD -->
+      <div id="dashboard">
+        <div class="bot-eyebrow">PRIVATE — AUTHORIZED</div>
+        <h1 class="bot-title">TRADING<br>BOT.</h1>
+
+        <div class="refresh-row">
+          <div class="last-updated" id="last-updated">Loading...</div>
+          <div style="display:flex;gap:0.75rem;">
+            <button class="btn-sm" onclick="fetchData()">REFRESH</button>
+            <button class="btn-sm" onclick="logout()">LOG OUT</button>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-box"><div class="stat-label">Status</div><div class="stat-value" id="s-status">—</div></div>
+          <div class="stat-box"><div class="stat-label">Total Events</div><div class="stat-value" id="s-total">—</div></div>
+          <div class="stat-box"><div class="stat-label">Trades</div><div class="stat-value up" id="s-trades">—</div></div>
+          <div class="stat-box"><div class="stat-label">Blocked</div><div class="stat-value" id="s-blocked">—</div></div>
+          <div class="stat-box"><div class="stat-label">No-Trade</div><div class="stat-value dim" id="s-notrade">—</div></div>
+          <div class="stat-box"><div class="stat-label">Last Symbol</div><div class="stat-value" id="s-symbol">—</div></div>
+          <div class="stat-box"><div class="stat-label">Confidence</div><div class="stat-value" id="s-conf">—</div></div>
+          <div class="stat-box"><div class="stat-label">Last Action</div><div class="stat-value" id="s-action">—</div></div>
+        </div>
+
+        <div class="section-label">LAST CLAUDE REASONING</div>
+        <div class="reasoning-box" id="reasoning-box"><div style="opacity:0.3">Loading...</div></div>
+
+        <div class="section-label" style="margin-top:3rem;">DECISION LOG — LAST 50</div>
+        <div style="overflow-x:auto;">
+          <table class="log-table">
+            <thead><tr>
+              <th>TIME (UTC)</th><th>SYMBOL</th><th>SCORE</th><th>TRIGGER</th>
+              <th>CLAUDE</th><th>CONF</th><th>RISK</th><th>TAKEN</th><th>FLAGS</th>
+            </tr></thead>
+            <tbody id="log-body"><tr><td colspan="9" style="opacity:0.3">Loading...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const API = "https://worker-production-d8b2.up.railway.app";
+    let _token = null;
+    let _refreshTimer = null;
+
+    // ── Auto-advance digit inputs ─────────────────────────────────
+    document.querySelectorAll(".code-digit").forEach((el, i, all) => {
+      el.addEventListener("input", () => {
+        el.value = el.value.replace(/\D/g, "").slice(-1);
+        if (el.value && i < all.length - 1) all[i + 1].focus();
+        if (i === all.length - 1 && el.value) submitCode();
+      });
+      el.addEventListener("keydown", e => {
+        if (e.key === "Backspace" && !el.value && i > 0) all[i - 1].focus();
+        if (e.key === "Enter") submitCode();
+      });
+      el.addEventListener("paste", e => {
+        const txt = (e.clipboardData || window.clipboardData).getData("text").replace(/\D/g, "");
+        if (txt.length === 6) {
+          [...txt].forEach((c, j) => { if (all[j]) all[j].value = c; });
+          submitCode();
+          e.preventDefault();
+        }
+      });
+    });
+
+    // Auto-focus first digit on load
+    window.addEventListener("DOMContentLoaded", () => {
+      const saved = sessionStorage.getItem("bot_token");
+      if (saved) { _token = saved; showDashboard(); }
+      else { document.querySelector(".code-digit").focus(); }
+    });
+
+    // ── Auth ──────────────────────────────────────────────────────
+    async function submitCode() {
+      const digits = [...document.querySelectorAll(".code-digit")].map(e => e.value);
+      const code = digits.join("");
+      if (code.length !== 6) return;
+
+      const btn = document.getElementById("auth-btn");
+      btn.disabled = true;
+      btn.textContent = "VERIFYING...";
+      document.getElementById("auth-error").style.display = "none";
+
+      try {
+        const res  = await fetch(`${API}/api/auth`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code }),
+        });
+        const data = await res.json();
+        if (res.ok && data.token) {
+          _token = data.token;
+          sessionStorage.setItem("bot_token", _token);
+          showDashboard();
+        } else {
+          document.getElementById("auth-error").style.display = "block";
+          document.querySelectorAll(".code-digit").forEach(e => e.value = "");
+          document.querySelector(".code-digit").focus();
+        }
+      } catch(e) {
+        document.getElementById("auth-error").textContent = "Could not reach server.";
+        document.getElementById("auth-error").style.display = "block";
+      }
+      btn.disabled = false;
+      btn.textContent = "VERIFY →";
+    }
+
+    function logout() {
+      sessionStorage.removeItem("bot_token");
+      _token = null;
+      if (_refreshTimer) clearInterval(_refreshTimer);
+      document.getElementById("dashboard").style.display = "none";
+      document.getElementById("auth-screen").style.display = "block";
+      document.querySelectorAll(".code-digit").forEach(e => e.value = "");
+      document.querySelector(".code-digit").focus();
+    }
+
+    function showDashboard() {
+      document.getElementById("auth-screen").style.display = "none";
+      document.getElementById("dashboard").style.display  = "block";
+      fetchData();
+      _refreshTimer = setInterval(fetchData, 30000);
+    }
+
+    // ── Data ──────────────────────────────────────────────────────
+    async function fetchData() {
+      if (!_token) return;
+      try {
+        const [sRes, lRes] = await Promise.all([
+          fetch(`${API}/api/status?token=${_token}`),
+          fetch(`${API}/api/log?token=${_token}`)
+        ]);
+        if (sRes.status === 401 || lRes.status === 401) { logout(); return; }
+        const status = await sRes.json();
+        const log    = await lRes.json();
+        renderStatus(status, log);
+        renderLog(log.entries || []);
+        document.getElementById("last-updated").textContent =
+          "Refreshed " + new Date().toLocaleTimeString();
+      } catch(e) {
+        document.getElementById("last-updated").textContent = "Connection error — retrying...";
+      }
+    }
+
+    function renderStatus(status, log) {
+      document.getElementById("s-status").textContent  = status.status || "—";
+      document.getElementById("s-total").textContent   = log.total ?? "—";
+      document.getElementById("s-trades").textContent  = log.trades ?? "—";
+      document.getElementById("s-blocked").textContent = log.blocked ?? "—";
+      document.getElementById("s-notrade").textContent = log.no_trades ?? "—";
+      document.getElementById("s-symbol").textContent  = status.last_symbol || "—";
+      document.getElementById("s-conf").textContent    = status.last_confidence
+        ? (status.last_confidence * 100).toFixed(0) + "%" : "—";
+      document.getElementById("s-action").textContent  = status.last_action || "—";
+
+      const entries = log.entries || [];
+      const last = entries[entries.length - 1];
+      if (!last) { document.getElementById("reasoning-box").innerHTML = "<div style='opacity:.3'>No decisions yet.</div>"; return; }
+      const c = last.claude || {}, r = last.risk || {};
+      const ac = c.action === "BUY" ? "badge-g" : c.action === "SELL" ? "badge-r" : "badge-dim";
+      document.getElementById("reasoning-box").innerHTML = `
+        <div class="r-field"><div class="r-key">Symbol</div><div class="r-val">${last.symbol || "—"} &nbsp; <span style="opacity:.4;font-size:.75rem">${(last.trigger||"").slice(0,40)}</span></div></div>
+        <div class="r-field"><div class="r-key">Setup Score</div><div class="r-val">${last.setup_score != null ? (last.setup_score * 100).toFixed(1) + "%" : "—"} ${last.is_broad_market ? '<span class="badge badge-dim">BROAD MARKET</span>' : ""}</div></div>
+        <div class="r-field"><div class="r-key">Claude Decision</div><div class="r-val"><span class="badge ${ac}">${c.action||"—"}</span> &nbsp; ${c.confidence != null ? (c.confidence*100).toFixed(0)+"% confidence" : ""}</div></div>
+        <div class="r-field"><div class="r-key">Thesis</div><div class="r-val">${c.thesis||"—"}</div></div>
+        <div class="r-field"><div class="r-key">Invalidation</div><div class="r-val">${c.invalidation||"—"}</div></div>
+        <div class="r-field"><div class="r-key">No-Trade Reason</div><div class="r-val">${c.no_trade_reason||"—"}</div></div>
+        <div class="r-field"><div class="r-key">Risk Engine</div><div class="r-val">${r.approved ? '<span class="badge badge-g">APPROVED</span>' : '<span class="badge badge-r">BLOCKED</span>'} &nbsp; <span style="opacity:.5;font-size:.75rem">${(r.reasons||[]).slice(0,3).join(" · ")}</span></div></div>
+        ${c.warning_flags?.length ? `<div class="r-field"><div class="r-key">Warnings</div><div class="r-val warn">${c.warning_flags.join(" · ")}</div></div>` : ""}
+      `;
+    }
+
+    function scoreBar(score) {
+      if (score == null) return "—";
+      const pct = Math.round(score * 100);
+      return `<span title="${pct}%"><span class="score-bar"><span class="score-fill" style="width:${pct}%"></span></span> ${pct}%</span>`;
+    }
+
+    function renderLog(entries) {
+      const tbody = document.getElementById("log-body");
+      if (!entries.length) { tbody.innerHTML = "<tr><td colspan='9' style='opacity:.3'>No decisions logged yet.</td></tr>"; return; }
+      tbody.innerHTML = [...entries].reverse().slice(0,50).map(e => {
+        const c = e.claude || {}, r = e.risk || {};
+        const ac = c.action === "BUY" ? "act-buy" : c.action === "SELL" ? "act-sell" : "act-no";
+        const tc = (e.action_taken && !["NO_ACTION","BLOCKED","SKIPPED",""].includes(e.action_taken)) ? "act-buy" : "act-no";
+        return `<tr>
+          <td>${(e.timestamp||"").slice(0,19).replace("T"," ")}</td>
+          <td>${e.symbol||"—"}</td>
+          <td>${scoreBar(e.setup_score)}</td>
+          <td style="max-width:140px;word-break:break-word;font-size:.68rem">${(e.trigger||"—").slice(0,35)}</td>
+          <td class="${ac}">${c.action||"—"}</td>
+          <td>${c.confidence != null ? (c.confidence*100).toFixed(0)+"%" : "—"}</td>
+          <td>${r.approved ? '<span class="badge badge-g" style="font-size:.55rem">OK</span>' : '<span class="badge badge-r" style="font-size:.55rem">BLK</span>'}</td>
+          <td class="${tc}">${(e.action_taken||"—").slice(0,12)}</td>
+          <td class="warn" style="font-size:.62rem;max-width:150px;word-break:break-word">${(c.warning_flags||[]).join(", ")}</td>
+        </tr>`;
+      }).join("");
+    }
+
+    function toggleMenu() { document.getElementById("mobileMenu")?.classList.toggle("open"); }
+  </script>
+</body>
+</html>
