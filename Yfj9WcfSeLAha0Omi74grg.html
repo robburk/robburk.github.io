@@ -254,10 +254,10 @@
 
         <!-- Last decision detail with debate breakdown -->
         <div class="section-label">LAST DECISION</div>
-        <div class="reasoning-box" id="reasoning-box"><div class="dim">No decisions yet. The bot only logs when a coin triggers (ATR move, RSI extreme, or volume spike).</div></div>
+        <div class="reasoning-box" id="reasoning-box"><div class="dim">No decisions yet. The bot only logs when a stock triggers (RSI extreme, ATR move, or volume spike).</div></div>
 
-        <!-- Per-coin performance -->
-        <div class="section-label">PER-COIN PERFORMANCE</div>
+        <!-- Per-stock performance -->
+        <div class="section-label">PER-STOCK PERFORMANCE</div>
         <div style="overflow-x:auto; margin-bottom:2.5rem;">
           <table class="perf-table">
             <thead><tr>
@@ -499,7 +499,7 @@
     function renderLastDecision(entries) {
       const box = document.getElementById("reasoning-box");
       if (!entries.length) {
-        box.innerHTML = `<div class="dim">No decisions yet. The bot only logs when a coin triggers (ATR move, RSI extreme, or volume spike).</div>`;
+        box.innerHTML = `<div class="dim">No decisions yet. The bot only logs when a stock triggers (RSI extreme, ATR move, or volume spike).</div>`;
         return;
       }
       const last = entries[entries.length - 1];
@@ -563,7 +563,7 @@
       const coins = perf.coins || {};
       const entries = Object.entries(coins);
       if (!entries.length) {
-        tbody.innerHTML = `<tr><td colspan="7" class="perf-empty">No completed trades yet. Stats appear after the first trade closes.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="perf-empty">No completed trades yet. Stats appear after the first stock trade closes.</td></tr>`;
         return;
       }
       entries.sort((a,b) => (b[1].trades || 0) - (a[1].trades || 0));
