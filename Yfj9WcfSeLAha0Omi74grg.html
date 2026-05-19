@@ -252,6 +252,27 @@
         </div>
         <div class="memo-box" id="memo-box"><div class="memo-empty">No reflection has run yet. The bot generates a strategy memo every 24 hours after observing decisions.</div></div>
 
+        <!-- Live watchlist — what the bot is seeing right now -->
+        <div class="section-label">
+          LIVE WATCHLIST
+          <span class="sublabel" id="live-meta-label">—</span>
+        </div>
+        <div style="overflow-x:auto; margin-bottom:2.5rem;">
+          <table class="perf-table">
+            <thead><tr>
+              <th>SYMBOL</th>
+              <th class="num">PRICE</th>
+              <th class="num">RSI</th>
+              <th class="num">VOL R.</th>
+              <th class="num">SPREAD</th>
+              <th>TREND</th>
+              <th class="num">SCORE</th>
+              <th>STATUS</th>
+            </tr></thead>
+            <tbody id="live-body"><tr><td colspan="8" class="perf-empty">Waiting for first scoring cycle...</td></tr></tbody>
+          </table>
+        </div>
+
         <!-- Last decision detail with debate breakdown -->
         <div class="section-label">LAST DECISION</div>
         <div class="reasoning-box" id="reasoning-box"><div class="dim">No decisions yet. The bot only logs when a stock triggers (RSI extreme, ATR move, or volume spike).</div></div>
@@ -295,6 +316,7 @@
     let _refreshTimer = null;
     let _memoCounter = 0;        // memo fetches every Nth tick
     let _perfCounter = 0;        // perf fetches every Nth tick
+    let _liveCounter = 0;        // live state fetches every Nth tick
 
     // ── Auto-advance digit inputs ─────────────────────────────────
     document.querySelectorAll(".code-digit").forEach((el, i, all) => {
@@ -379,10 +401,11 @@
     async function fetchData(initial) {
       if (!_token) return;
 
-      // Always fetch status + log. Memo and perf less often.
+      // Always fetch status + log + live_state. Memo and perf less often.
       const fetches = [
         fetch(`${API}/api/status?token=${_token}`).then(r => r),
         fetch(`${API}/api/log?token=${_token}`).then(r => r),
+        fetch(`${API}/api/live_state?token=${_token}`).then(r => r),
       ];
       const wantMemo = initial || (_memoCounter++ % 10 === 0);  // ~ every 5min
       const wantPerf = initial || (_perfCounter++ % 2 === 0);   // ~ every minute
@@ -395,13 +418,15 @@
 
         const status = await responses[0].json();
         const log    = await responses[1].json();
+        const live   = await responses[2].json();
         let memo = null, perf = null;
-        let idx = 2;
+        let idx = 3;
         if (wantMemo) memo = await responses[idx++].json();
         if (wantPerf) perf = await responses[idx++].json();
 
         renderLive(status);
         renderStats(status, log);
+        renderWatchlist(live);
         renderLastDecision(log.entries || []);
         renderLog(log.entries || []);
         if (memo) renderMemo(memo);
@@ -556,6 +581,60 @@
       }
 
       box.innerHTML = html;
+    }
+
+    function renderWatchlist(live) {
+      const tbody = document.getElementById("live-body");
+      const meta  = document.getElementById("live-meta-label");
+      const rows  = live?.rows || [];
+      const age   = live?.age_seconds;
+      meta.textContent = age == null
+        ? "no data yet"
+        : age < 60 ? `updated ${age}s ago` : `updated ${Math.floor(age/60)}m ago`;
+      if (!rows.length) {
+        tbody.innerHTML = `<tr><td colspan="8" class="perf-empty">Waiting for first scoring cycle...</td></tr>`;
+        return;
+      }
+      // Sort: triggered first, then by score desc
+      rows.sort((a, b) => {
+        if ((b.triggered ? 1 : 0) !== (a.triggered ? 1 : 0)) return (b.triggered ? 1 : 0) - (a.triggered ? 1 : 0);
+        return (b.score || 0) - (a.score || 0);
+      });
+      tbody.innerHTML = rows.map(r => {
+        if (r.status === "NO_DATA") {
+          return `<tr><td><strong>${esc(r.symbol)}</strong></td><td colspan="7" class="dim">no data (market closed or stale feed)</td></tr>`;
+        }
+        const price = r.price != null ? "$" + r.price.toFixed(2) : "—";
+        const rsi   = r.rsi != null ? r.rsi.toFixed(1) : "—";
+        const rsiCls = r.rsi == null ? "dim" : (r.rsi <= 32 || r.rsi >= 68) ? "up" : "";
+        const vr    = r.volume_ratio != null ? r.volume_ratio.toFixed(2) + "x" : "—";
+        const sp    = r.spread_pct != null ? (r.spread_pct * 100).toFixed(3) + "%" : "—";
+        const spCls = r.spread_pct != null && r.spread_pct > 0.005 ? "down" : "";
+        const score = r.score != null ? r.score.toFixed(3) : "—";
+        const scoreCls = r.score == null ? "dim" : r.passes ? "up" : "down";
+        let statusBadge;
+        if (r.triggered && r.passes) {
+          statusBadge = `<span class="badge badge-g">FIRING</span>`;
+        } else if (r.triggered) {
+          statusBadge = `<span class="badge badge-a">TRIGGERED · BLOCKED</span>`;
+        } else if (r.passes) {
+          statusBadge = `<span class="badge badge-g">ELIGIBLE</span>`;
+        } else if (r.fails && r.fails.length) {
+          statusBadge = `<span class="badge badge-r">${esc(r.fails[0].slice(0,18))}</span>`;
+        } else {
+          statusBadge = `<span class="badge badge-dim">QUIET</span>`;
+        }
+        return `<tr>
+          <td><strong>${esc(r.symbol)}</strong>${r.trigger_reason ? `<div style="font-size:.58rem;opacity:.6;margin-top:.15rem">${esc(r.trigger_reason.slice(0,32))}</div>` : ""}</td>
+          <td class="num">${price}</td>
+          <td class="num ${rsiCls}">${rsi}</td>
+          <td class="num">${vr}</td>
+          <td class="num ${spCls}">${sp}</td>
+          <td style="font-size:.68rem">${esc(r.trend || "—")}</td>
+          <td class="num ${scoreCls}">${score} <span class="dim" style="font-size:.62rem">/${r.min_score?.toFixed(2) || "?"}</span></td>
+          <td>${statusBadge}</td>
+        </tr>`;
+      }).join("");
     }
 
     function renderPerf(perf) {
