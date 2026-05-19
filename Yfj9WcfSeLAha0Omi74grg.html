@@ -294,15 +294,33 @@
           </table>
         </div>
 
-        <!-- Decision log -->
-        <div class="section-label">DECISION LOG — LAST 50</div>
-        <div style="overflow-x:auto;">
+        <!-- Today's decisions -->
+        <div class="section-label">
+          TODAY'S DECISIONS
+          <span class="sublabel" id="today-meta">—</span>
+        </div>
+        <div style="overflow-x:auto; margin-bottom:2.5rem;">
           <table class="log-table">
             <thead><tr>
               <th>TIME (UTC)</th><th>SYMBOL</th><th>SCORE</th><th>TRIGGER</th>
               <th>CLAUDE</th><th>CONF</th><th>RISK</th><th>TAKEN</th><th>FLAGS</th>
             </tr></thead>
-            <tbody id="log-body"><tr><td colspan="9" class="dim">Loading...</td></tr></tbody>
+            <tbody id="log-today-body"><tr><td colspan="9" class="dim">Loading today's decisions...</td></tr></tbody>
+          </table>
+        </div>
+
+        <!-- Historical decisions -->
+        <div class="section-label">
+          HISTORICAL DECISIONS
+          <span class="sublabel" id="historical-meta">—</span>
+        </div>
+        <div style="overflow-x:auto; margin-bottom:2rem;">
+          <table class="log-table">
+            <thead><tr>
+              <th>DATE</th><th>TIME (UTC)</th><th>SYMBOL</th><th>SCORE</th><th>TRIGGER</th>
+              <th>CLAUDE</th><th>CONF</th><th>RISK</th><th>TAKEN</th>
+            </tr></thead>
+            <tbody id="log-historical-body"><tr><td colspan="9" class="dim">Loading prior sessions...</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -317,6 +335,7 @@
     let _memoCounter = 0;        // memo fetches every Nth tick
     let _perfCounter = 0;        // perf fetches every Nth tick
     let _liveCounter = 0;        // live state fetches every Nth tick
+    let _historicalCounter = 0;  // historical fetches every Nth tick
 
     // ── Auto-advance digit inputs ─────────────────────────────────
     document.querySelectorAll(".code-digit").forEach((el, i, all) => {
@@ -401,16 +420,19 @@
     async function fetchData(initial) {
       if (!_token) return;
 
-      // Always fetch status + log + live_state. Memo and perf less often.
+      // Always fetch status + log + live_state + today. Historical and memo + perf less often.
       const fetches = [
         fetch(`${API}/api/status?token=${_token}`).then(r => r),
         fetch(`${API}/api/log?token=${_token}`).then(r => r),
         fetch(`${API}/api/live_state?token=${_token}`).then(r => r),
+        fetch(`${API}/api/log/today?token=${_token}`).then(r => r),
       ];
       const wantMemo = initial || (_memoCounter++ % 10 === 0);  // ~ every 5min
       const wantPerf = initial || (_perfCounter++ % 2 === 0);   // ~ every minute
+      const wantHistorical = initial || (_historicalCounter++ % 4 === 0); // ~ every 2min
       if (wantMemo) fetches.push(fetch(`${API}/api/memo?token=${_token}`).then(r => r));
       if (wantPerf) fetches.push(fetch(`${API}/api/performance?token=${_token}`).then(r => r));
+      if (wantHistorical) fetches.push(fetch(`${API}/api/log/historical?token=${_token}`).then(r => r));
 
       try {
         const responses = await Promise.all(fetches);
@@ -419,16 +441,19 @@
         const status = await responses[0].json();
         const log    = await responses[1].json();
         const live   = await responses[2].json();
-        let memo = null, perf = null;
-        let idx = 3;
+        const today  = await responses[3].json();
+        let memo = null, perf = null, historical = null;
+        let idx = 4;
         if (wantMemo) memo = await responses[idx++].json();
         if (wantPerf) perf = await responses[idx++].json();
+        if (wantHistorical) historical = await responses[idx++].json();
 
         renderLive(status);
         renderStats(status, log);
         renderWatchlist(live);
         renderLastDecision(log.entries || []);
-        renderLog(log.entries || []);
+        renderToday(today);
+        if (historical) renderHistorical(historical);
         if (memo) renderMemo(memo);
         if (perf) renderPerf(perf);
 
@@ -675,10 +700,15 @@
       return `<span title="${pct}%"><span class="score-bar"><span class="score-fill" style="width:${pct}%"></span></span> ${pct}%</span>`;
     }
 
-    function renderLog(entries) {
-      const tbody = document.getElementById("log-body");
+    function renderToday(log) {
+      const tbody = document.getElementById("log-today-body");
+      const meta = document.getElementById("today-meta");
+      const entries = log?.entries || [];
+      const source = log?.source || "local";
+      const sourceLabel = source === "d1" ? "persistent" : "session only — D1 inactive";
+      meta.textContent = `${entries.length} ${entries.length === 1 ? "decision" : "decisions"} · ${sourceLabel}`;
       if (!entries.length) {
-        tbody.innerHTML = "<tr><td colspan='9' class='dim'>No decisions logged yet.</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='9' class='dim'>No decisions logged today yet. The bot only logs when a stock triggers (RSI extreme, ATR move, or volume spike).</td></tr>";
         return;
       }
       tbody.innerHTML = [...entries].reverse().slice(0,50).map(e => {
@@ -687,7 +717,7 @@
         const taken = e.action_taken || "—";
         const tc = (taken && !["NO_ACTION","BLOCKED","SKIPPED",""].includes(taken)) ? "act-buy" : "act-no";
         return `<tr>
-          <td>${esc((e.timestamp||"").slice(0,19).replace("T"," "))}</td>
+          <td>${esc((e.timestamp||"").slice(11,19))}</td>
           <td>${esc(e.symbol||"—")}</td>
           <td>${scoreBar(e.setup_score)}</td>
           <td style="max-width:160px;word-break:break-word;font-size:.68rem">${esc((e.trigger||"—").slice(0,40))}</td>
@@ -696,6 +726,49 @@
           <td>${r.approved ? '<span class="badge badge-g" style="font-size:.55rem">OK</span>' : '<span class="badge badge-r" style="font-size:.55rem">BLK</span>'}</td>
           <td class="${tc}">${esc(taken.slice(0,14))}</td>
           <td class="warn" style="font-size:.62rem;max-width:170px;word-break:break-word">${esc((c.warning_flags||[]).join(", "))}</td>
+        </tr>`;
+      }).join("");
+    }
+
+    function renderHistorical(log) {
+      const tbody = document.getElementById("log-historical-body");
+      const meta = document.getElementById("historical-meta");
+      const entries = log?.entries || [];
+      const total = log?.total || 0;
+      const d1 = log?.d1_enabled;
+      if (d1 === false) {
+        meta.textContent = "D1 not configured";
+      } else {
+        meta.textContent = total > 0
+          ? `${total} ${total === 1 ? "prior decision" : "prior decisions"}`
+          : "no prior decisions yet";
+      }
+      if (!entries.length) {
+        const msg = d1 === false
+          ? "Persistent storage not configured. Add D1 env vars to Railway to see decisions from prior sessions."
+          : "No prior session decisions yet. Decisions from earlier sessions will appear here.";
+        tbody.innerHTML = `<tr><td colspan='9' class='dim'>${msg}</td></tr>`;
+        return;
+      }
+      // entries already DESC-sorted by ts_unix from D1
+      tbody.innerHTML = entries.slice(0,200).map(e => {
+        const c = e.claude || {}, r = e.risk || {};
+        const ts = e.timestamp || "";
+        const date = ts.slice(0,10);
+        const time = ts.slice(11,19);
+        const ac = c.action === "BUY" ? "act-buy" : c.action === "SELL" ? "act-sell" : "act-no";
+        const taken = e.action_taken || "—";
+        const tc = (taken && !["NO_ACTION","BLOCKED","SKIPPED",""].includes(taken)) ? "act-buy" : "act-no";
+        return `<tr>
+          <td style="font-size:.68rem">${esc(date)}</td>
+          <td>${esc(time)}</td>
+          <td>${esc(e.symbol||"—")}</td>
+          <td>${scoreBar(e.setup_score)}</td>
+          <td style="max-width:160px;word-break:break-word;font-size:.68rem">${esc((e.trigger||"—").slice(0,40))}</td>
+          <td class="${ac}">${esc(c.action||"—")}</td>
+          <td>${c.confidence != null ? (c.confidence*100).toFixed(0)+"%" : "—"}</td>
+          <td>${r.approved ? '<span class="badge badge-g" style="font-size:.55rem">OK</span>' : '<span class="badge badge-r" style="font-size:.55rem">BLK</span>'}</td>
+          <td class="${tc}">${esc(taken.slice(0,14))}</td>
         </tr>`;
       }).join("");
     }
