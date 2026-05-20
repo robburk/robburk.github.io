@@ -214,6 +214,7 @@
           <div class="last-updated" id="last-updated">Loading...</div>
           <div style="display:flex;gap:0.6rem;">
             <button class="btn-sm" onclick="fetchData()">REFRESH</button>
+            <button class="btn-sm" onclick="downloadCSV()">DOWNLOAD CSV</button>
             <button class="btn-sm" onclick="logout()">LOG OUT</button>
           </div>
         </div>
@@ -407,6 +408,27 @@
       document.getElementById("auth-screen").style.display = "block";
       document.querySelectorAll(".code-digit").forEach(e => e.value = "");
       document.querySelector(".code-digit").focus();
+    }
+
+    async function downloadCSV() {
+      if (!_token) return;
+      try {
+        const res = await fetch(`${API}/api/export?token=${_token}`);
+        if (res.status === 401) { logout(); return; }
+        if (!res.ok) { alert("Download failed. Try refreshing and logging in again."); return; }
+        const blob = await res.blob();
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement("a");
+        const today = new Date().toISOString().slice(0, 10);
+        a.href = url;
+        a.download = `trading_decisions_${today}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        alert("Download error: " + e.message);
+      }
     }
 
     function showDashboard() {
