@@ -410,25 +410,12 @@
       document.querySelector(".code-digit").focus();
     }
 
-    async function downloadCSV() {
-      if (!_token) return;
-      try {
-        const res = await fetch(`${API}/api/export?token=${_token}`);
-        if (res.status === 401) { logout(); return; }
-        if (!res.ok) { alert("Download failed. Try refreshing and logging in again."); return; }
-        const blob = await res.blob();
-        const url  = URL.createObjectURL(blob);
-        const a    = document.createElement("a");
-        const today = new Date().toISOString().slice(0, 10);
-        a.href = url;
-        a.download = `trading_decisions_${today}.csv`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      } catch (e) {
-        alert("Download error: " + e.message);
-      }
+    function downloadCSV() {
+      if (!_token) { alert("Please log in first."); return; }
+      // Open the export URL directly so the browser handles the download
+      // natively (no fetch/CORS preflight, which was failing).
+      const url = `${API}/api/export?token=${encodeURIComponent(_token)}`;
+      window.open(url, "_blank");
     }
 
     function showDashboard() {
