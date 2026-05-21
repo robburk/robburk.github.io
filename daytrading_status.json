@@ -187,5 +187,76 @@
     "status": "none",
     "memo": ""
   },
-  "as_of": "2026-05-21T20:18:26.885835+00:00"
+  "supplemental_data": {
+    "as_of": "2026-05-21T21:17:29.181653+00:00",
+    "primary_source": "alpaca_iex",
+    "supplemental_source": "none",
+    "alpaca_microstructure": {
+      "available": true,
+      "feed": "iex",
+      "symbols": {
+        "SPY": {
+          "bid": null,
+          "ask": null,
+          "bid_size": null,
+          "ask_size": null,
+          "quote_ts": null,
+          "last_trade": null,
+          "trade_size": null,
+          "trade_ts": null,
+          "spread": null,
+          "spread_pct": null,
+          "spread_label": null
+        },
+        "QQQ": {
+          "bid": null,
+          "ask": null,
+          "bid_size": null,
+          "ask_size": null,
+          "quote_ts": null,
+          "last_trade": null,
+          "trade_size": null,
+          "trade_ts": null,
+          "spread": null,
+          "spread_pct": null,
+          "spread_label": null
+        },
+        "IWM": {
+          "bid": null,
+          "ask": null,
+          "bid_size": null,
+          "ask_size": null,
+          "quote_ts": null,
+          "last_trade": null,
+          "trade_size": null,
+          "trade_ts": null,
+          "spread": null,
+          "spread_pct": null,
+          "spread_label": null
+        },
+        "SMH": {
+          "bid": null,
+          "ask": null,
+          "bid_size": null,
+          "ask_size": null,
+          "quote_ts": null,
+          "last_trade": null,
+          "trade_size": null,
+          "trade_ts": null,
+          "spread": null,
+          "spread_pct": null,
+          "spread_label": null
+        }
+      }
+    },
+    "finnhub_tape": {
+      "enabled": false,
+      "status": "skipped"
+    },
+    "microstructure_lite": "partial",
+    "level2": "unavailable",
+    "order_book_imbalance": "unavailable",
+    "note": "IEX-only, partial-market data. Sufficient for ORB research, not full microstructure. No full order book imbalance available."
+  },
+  "as_of": "2026-05-21T21:17:29.192353+00:00"
 }
