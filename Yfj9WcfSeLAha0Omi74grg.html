@@ -336,6 +336,14 @@
             </div>
           </div>
           <div class="exp-warn">⚠ PAPER EXPERIMENTAL ONLY. LIVE TRADING DISABLED. DOES NOT USE CORE ALLOCATION CAPITAL. Paper orders require explicit arming + a verified Alpaca paper account; until armed, the engine only logs the orders it would place.</div>
+          <div class="dt-reports">
+            <div class="stat-label" style="margin-top:0.4rem;">Latest daily research note</div>
+            <div class="exp-val" id="dt-daily" style="font-size:0.72rem; line-height:1.5;">—</div>
+            <div class="stat-label" style="margin-top:0.7rem;">Weekly evidence summary</div>
+            <div class="exp-val" id="dt-weekly" style="font-size:0.72rem; line-height:1.5;">—</div>
+            <div class="stat-label" style="margin-top:0.7rem;">AI research memo <span style="opacity:0.5;">(optional, analysis-only)</span></div>
+            <div class="exp-val" id="dt-memo" style="font-size:0.72rem; line-height:1.5;">—</div>
+          </div>
         </div>
 
         <!-- ════════ ARCHIVED RESEARCH (collapsed) ════════ -->
@@ -725,6 +733,25 @@
       set("dt-total", d.setups_logged_total != null ? d.setups_logged_total : 0);
       set("dt-today", d.setups_logged_today != null ? d.setups_logged_today : 0);
       set("dt-promoted", d.any_promoted ? "see report" : "NONE");
+      // daily/weekly reports + optional AI memo
+      const dr = d.daily_report;
+      if (dr) {
+        set("dt-daily", `${dr.date||""}: ${dr.shadow_setups_today||0} shadow setups, ${dr.paper_trades_today||0} paper trades` +
+          (dr.best_setup ? ` · best ${dr.best_setup.strategy} ${dr.best_setup.final_r>0?'+':''}${dr.best_setup.final_r}R` : "") +
+          (dr.last_refusal ? ` · refusal: ${dr.last_refusal}` : ""));
+      }
+      const wr = d.weekly_report;
+      if (wr && wr.per_strategy) {
+        const parts = Object.entries(wr.per_strategy).map(([k,m]) =>
+          `${k.replace(/_/g," ")}: n=${m.n}, ${m.expectancy_r>0?'+':''}${m.expectancy_r}R (${m.evidence_tier||""})`);
+        set("dt-weekly", `${wr.shadow_setups_total||0} total setups. ` + parts.join(" · "));
+      }
+      const memo = d.ai_memo;
+      if (memo) {
+        if (memo.status === "ok" && memo.memo) set("dt-memo", memo.memo.slice(0, 600));
+        else if (memo.status === "disabled") set("dt-memo", "Disabled (non-AI reports still produced). Enable via DAYTRADING_AI_MEMO_ENABLED.");
+        else set("dt-memo", "Not available — " + (memo.status || "none"));
+      }
       const rep = d.report || {};
       const host = document.getElementById("dt-strats");
       if (host) {

@@ -85,13 +85,107 @@
     "last_refusal": null,
     "last_candidate": null,
     "market_session": "AFTERHOURS",
-    "et_time": "2026-05-21 16:08 ET",
+    "et_time": "2026-05-21 16:17 ET",
     "paper_armed": false,
     "paper_orders_enabled": true,
     "live_trading_enabled": false,
     "active_strategy": "ORB_15M_LONG_ONLY",
     "scanner_status": "OUTSIDE_MARKET_HOURS",
-    "updated_at": "2026-05-21T20:08:20.011276+00:00"
+    "updated_at": "2026-05-21T20:17:56.172410+00:00"
   },
-  "as_of": "2026-05-21T20:09:06.994873+00:00"
+  "daily_report": {
+    "date": "2026-05-21",
+    "generated_at": "2026-05-21T20:17:34.069281+00:00",
+    "scanner_status": "OUTSIDE_MARKET_HOURS",
+    "market_session": "AFTERHOURS",
+    "opening_ranges": {},
+    "paper_trades_today": 2,
+    "paper_trades_detail": [
+      {
+        "symbol": "SPY",
+        "status": "dry_run",
+        "submitted": false,
+        "final_r": null,
+        "entry_ref": 101.0,
+        "stop": 99.8
+      },
+      {
+        "symbol": "SPY",
+        "status": "dry_run",
+        "submitted": false,
+        "final_r": null,
+        "entry_ref": 101.0,
+        "stop": 99.8
+      }
+    ],
+    "shadow_setups_today": 30,
+    "best_setup": {
+      "strategy": "trend_day_continuation",
+      "final_r": 1.1121
+    },
+    "worst_setup": {
+      "strategy": "vwap_reclaim",
+      "final_r": -1.5968
+    },
+    "safety_blocked_a_trade": true,
+    "last_refusal": null,
+    "eod_exit_status": null,
+    "data_issues": null,
+    "next_day_watch": "Watch first 15-min ORB on SPY/QQQ/IWM/SMH; monitor shadow strategies."
+  },
+  "weekly_report": {
+    "week_ending": "2026-05-21",
+    "generated_at": "2026-05-21T20:17:34.073223+00:00",
+    "shadow_setups_this_week": 170,
+    "shadow_setups_total": 775,
+    "per_strategy": {
+      "vwap_reclaim": {
+        "n": 322,
+        "win_rate": 0.416,
+        "avg_r": -0.0493,
+        "median_r": -0.8944,
+        "expectancy_r": -0.0493,
+        "profit_factor": 0.94,
+        "status": "research-only",
+        "evidence_tier": "early_research",
+        "recommendation": "keep testing \u2014 inconclusive"
+      },
+      "opening_range_breakout": {
+        "n": 243,
+        "win_rate": 0.424,
+        "avg_r": -0.075,
+        "median_r": -0.0832,
+        "expectancy_r": -0.075,
+        "profit_factor": 0.82,
+        "status": "research-only",
+        "evidence_tier": "early_research",
+        "recommendation": "keep testing \u2014 inconclusive"
+      },
+      "trend_day_continuation": {
+        "n": 210,
+        "win_rate": 0.314,
+        "avg_r": -0.2723,
+        "median_r": -1.1938,
+        "expectancy_r": -0.2723,
+        "profit_factor": 0.73,
+        "status": "research-only",
+        "evidence_tier": "early_research",
+        "recommendation": "watch \u2014 persistently negative, candidate for rejection if it holds"
+      }
+    },
+    "paper": {
+      "total_paper_trades_submitted": 0,
+      "closed_paper_trades": 0,
+      "evidence_tier": "execution_test_only",
+      "avg_r": null,
+      "win_rate": null,
+      "note": "ORB_15M_LONG_ONLY is the only paper-enabled strategy; others are shadow-only."
+    },
+    "promotion_note": "No strategy is promoted to paper without evidence. ORB stays the only paper strategy. Promotion requires forward-consistent positive expectancy over a meaningful sample, not a single good week."
+  },
+  "ai_memo": {
+    "status": "none",
+    "memo": ""
+  },
+  "as_of": "2026-05-21T20:18:26.885835+00:00"
 }
