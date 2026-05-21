@@ -315,6 +315,8 @@
               <div class="exp-val" id="dt-caps">1 trade/day · 1 open · ≤$500 · stop required · EOD exit</div>
               <div class="stat-label" style="margin-top:0.7rem;">Today</div>
               <div class="exp-val"><span id="dt-trades-today">0</span> paper trades · <span id="dt-realized">0</span>R realized</div>
+              <div class="stat-label" style="margin-top:0.7rem;">Scanner status</div>
+              <div class="exp-val" id="dt-scanner">—</div>
               <div class="stat-label" style="margin-top:0.7rem;">Last paper order</div>
               <div class="exp-val" id="dt-last-order">none yet</div>
               <div class="stat-label" style="margin-top:0.7rem;">Shadow setups logged</div>
@@ -716,6 +718,10 @@
       set("dt-realized", p.today_realized_r != null ? p.today_realized_r : 0);
       const lo = p.last_order;
       set("dt-last-order", lo ? `${lo.symbol||""} ${lo.strategy||""} · ${lo.status||""}${lo.submitted? " (submitted "+(lo.order_id||"").slice(0,8)+")" : " (dry-run)"}` : "none yet");
+      const sc = d.scanner || {};
+      const scLabel = (sc.scanner_status || "—").replace(/_/g," ");
+      const scExtra = sc.market_session ? ` · ${sc.market_session}` + (sc.et_time ? ` · ${sc.et_time}` : "") : "";
+      set("dt-scanner", scLabel + scExtra);
       set("dt-total", d.setups_logged_total != null ? d.setups_logged_total : 0);
       set("dt-today", d.setups_logged_today != null ? d.setups_logged_today : 0);
       set("dt-promoted", d.any_promoted ? "see report" : "NONE");

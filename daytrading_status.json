@@ -65,9 +65,33 @@
     "daily_loss_cap_r": -1.0,
     "weekly_loss_cap_r": -3.0,
     "open_positions": 0,
-    "trades_today": 0,
+    "trades_today": 2,
     "today_realized_r": 0,
-    "last_order": null
+    "last_order": {
+      "strategy": null,
+      "symbol": "SPY",
+      "status": "eod_exit_dry_run",
+      "submitted": null,
+      "qty": 1,
+      "order_id": null,
+      "safety_passed": null,
+      "logged_at": "2026-05-21T20:08:20.014373+00:00"
+    }
   },
-  "as_of": "2026-05-21T19:11:49.559418+00:00"
+  "scanner": {
+    "today": "2026-05-21",
+    "opening_ranges": {},
+    "trade_taken_today": false,
+    "last_refusal": null,
+    "last_candidate": null,
+    "market_session": "AFTERHOURS",
+    "et_time": "2026-05-21 16:08 ET",
+    "paper_armed": false,
+    "paper_orders_enabled": true,
+    "live_trading_enabled": false,
+    "active_strategy": "ORB_15M_LONG_ONLY",
+    "scanner_status": "OUTSIDE_MARKET_HOURS",
+    "updated_at": "2026-05-21T20:08:20.011276+00:00"
+  },
+  "as_of": "2026-05-21T20:09:06.994873+00:00"
 }
