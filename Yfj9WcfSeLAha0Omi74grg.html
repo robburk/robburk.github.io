@@ -296,29 +296,34 @@
 
         <!-- ════════ ② EXPERIMENTAL DAY-TRADING RESEARCH (secondary) ════════ -->
         <div class="section-label">② EXPERIMENTAL DAY-TRADING RESEARCH
-          <span class="sublabel">sandbox · shadow only</span></div>
+          <span class="sublabel" id="dt-asof">active shadow research · shadow only</span></div>
         <div class="exp-wrap">
           <div class="exp-head">
-            <span class="exp-pill">SHADOW ONLY</span>
+            <span class="exp-pill" id="dt-mode">ACTIVE SHADOW RESEARCH</span>
             <span class="exp-pill off">LIVE DISABLED</span>
-            <span class="exp-pill off">10% SIMULATED BUCKET</span>
+            <span class="exp-pill off">PAPER ORDERS DISABLED</span>
+            <span class="exp-pill off">NO CORE CAPITAL</span>
           </div>
           <div class="exp-body">
             <div>
-              <div class="stat-label">Research Universe</div>
+              <div class="stat-label">Broker</div>
+              <div class="exp-val">Alpaca paper / sandbox</div>
+              <div class="stat-label" style="margin-top:0.7rem;">Research Universe</div>
               <div class="exp-val">SPY · QQQ · IWM · SMH</div>
-              <div class="stat-label" style="margin-top:0.8rem;">Mode</div>
-              <div class="exp-val">Architecture reserved — engine not built yet</div>
-              <div class="stat-label" style="margin-top:0.8rem;">Strategy promoted?</div>
-              <div class="exp-val" style="color:#ef4444;">NONE</div>
+              <div class="stat-label" style="margin-top:0.7rem;">Shadow setups logged</div>
+              <div class="exp-val"><span id="dt-total">0</span> total · <span id="dt-today">0</span> today</div>
+              <div class="stat-label" style="margin-top:0.7rem;">Strategy promoted?</div>
+              <div class="exp-val" style="color:#ef4444;" id="dt-promoted">NONE</div>
             </div>
             <div>
-              <div class="stat-label">Strategies under research</div>
-              <div class="exp-strat">Opening range breakout <span class="exp-tag">research</span></div>
-              <div class="exp-strat">VWAP reclaim / rejection <span class="exp-tag">research</span></div>
-              <div class="exp-strat">Trend day continuation <span class="exp-tag">research</span></div>
-              <div class="exp-strat">Range-day mean reversion <span class="exp-tag">research</span></div>
-              <div class="exp-strat">Microstructure-lite (veto only) <span class="exp-tag">research</span></div>
+              <div class="stat-label">Strategies — shadow results (net R after costs)</div>
+              <div id="dt-strats">
+                <div class="exp-strat">Opening range breakout <span class="exp-tag">research</span></div>
+                <div class="exp-strat">VWAP reclaim / rejection <span class="exp-tag">research</span></div>
+                <div class="exp-strat">Trend day continuation <span class="exp-tag">research</span></div>
+                <div class="exp-strat">Range-day mean reversion <span class="exp-tag">research</span></div>
+                <div class="exp-strat">Microstructure-lite (veto only) <span class="exp-tag">research</span></div>
+              </div>
             </div>
           </div>
           <div class="exp-warn">⚠ Experimental only. Does not affect the core allocation engine. No live trading. No access to core allocation capital.</div>
@@ -596,6 +601,7 @@
         if (memo) renderMemo(memo);
         if (perf) renderPerf(perf);
         renderHybrid();
+        renderDaytrading();
 
         document.getElementById("last-updated").textContent =
           "Refreshed " + new Date().toLocaleTimeString();
@@ -664,6 +670,52 @@
       }
       set("core-last", s.last_monthly_check || "—");
       set("core-next", s.next_monthly_check || "—");
+    }
+
+    // Engine 2 — day-trading shadow research. Tries endpoint, falls back to JSON.
+    const DT_LABELS = {
+      opening_range_breakout: "Opening range breakout",
+      vwap_reclaim: "VWAP reclaim / rejection",
+      trend_day_continuation: "Trend day continuation",
+      range_day_mean_reversion: "Range-day mean reversion",
+    };
+    async function renderDaytrading() {
+      let d = null;
+      try {
+        const r = await fetch(`${API}/api/daytrading_research?token=${_token}`);
+        if (r.ok) d = await r.json();
+      } catch(e) {}
+      if (!d || d.enabled === undefined) {
+        try {
+          const r2 = await fetch(`daytrading_status.json?t=${Date.now()}`);
+          if (r2.ok) d = await r2.json();
+        } catch(e) {}
+      }
+      if (!d) return;
+      const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+      set("dt-mode", (d.mode === "shadow_only" ? "ACTIVE SHADOW RESEARCH" : (d.mode||"OFF").toUpperCase()));
+      set("dt-total", d.setups_logged_total != null ? d.setups_logged_total : 0);
+      set("dt-today", d.setups_logged_today != null ? d.setups_logged_today : 0);
+      set("dt-promoted", d.any_promoted ? "see report" : "NONE");
+      const rep = d.report || {};
+      const host = document.getElementById("dt-strats");
+      if (host) {
+        const order = ["opening_range_breakout","vwap_reclaim","trend_day_continuation","range_day_mean_reversion"];
+        let html = "";
+        order.forEach(k => {
+          const m = rep[k];
+          const label = DT_LABELS[k] || k;
+          if (m) {
+            const col = m.expectancy_r > 0 ? "#22c55e" : "#ef4444";
+            html += `<div class="exp-strat">${label}` +
+              `<span style="font-size:0.7rem;">n=${m.n} · <span style="color:${col};">${m.expectancy_r>0?'+':''}${m.expectancy_r}R</span> · win ${Math.round(m.win_rate*100)}% <span class="exp-tag">${m.status}</span></span></div>`;
+          } else {
+            html += `<div class="exp-strat">${label} <span class="exp-tag">research</span></div>`;
+          }
+        });
+        html += `<div class="exp-strat">Microstructure-lite (veto only) <span class="exp-tag">research</span></div>`;
+        host.innerHTML = html;
+      }
     }
 
     function setLive(cls, label, meta) {

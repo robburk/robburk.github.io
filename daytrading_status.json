@@ -1,0 +1,56 @@
+{
+  "engine": "daytrading_research",
+  "enabled": true,
+  "mode": "shadow_only",
+  "live_trading_enabled": false,
+  "paper_orders_enabled": false,
+  "uses_core_capital": false,
+  "broker": "Alpaca paper/sandbox",
+  "universe": [
+    "SPY",
+    "QQQ",
+    "IWM",
+    "SMH"
+  ],
+  "strategies": [
+    "opening_range_breakout",
+    "vwap_reclaim",
+    "trend_day_continuation",
+    "range_day_mean_reversion"
+  ],
+  "safety_ok": true,
+  "setups_logged_total": 775,
+  "setups_logged_today": 30,
+  "report": {
+    "vwap_reclaim": {
+      "n": 322,
+      "win_rate": 0.416,
+      "avg_r": -0.0493,
+      "median_r": -0.8944,
+      "expectancy_r": -0.0493,
+      "profit_factor": 0.94,
+      "status": "research-only"
+    },
+    "opening_range_breakout": {
+      "n": 243,
+      "win_rate": 0.424,
+      "avg_r": -0.075,
+      "median_r": -0.0832,
+      "expectancy_r": -0.075,
+      "profit_factor": 0.82,
+      "status": "research-only"
+    },
+    "trend_day_continuation": {
+      "n": 210,
+      "win_rate": 0.314,
+      "avg_r": -0.2723,
+      "median_r": -1.1938,
+      "expectancy_r": -0.2723,
+      "profit_factor": 0.73,
+      "status": "research-only"
+    }
+  },
+  "best_strategy": "vwap_reclaim",
+  "any_promoted": false,
+  "as_of": "2026-05-21T16:13:23.607168+00:00"
+}
