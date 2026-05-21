@@ -209,6 +209,62 @@
       .debate-grid { grid-template-columns: 1fr; }
       .live-meta { display: none; }
     }
+
+    /* ── Operating console: status bar ── */
+    .console-bar { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:1px;
+      border:1px solid currentColor; margin-bottom:1rem; }
+    .console-cell { padding:0.6rem 0.8rem; border:1px solid currentColor; }
+    .console-k { font-size:0.52rem; letter-spacing:0.1em; opacity:0.45; text-transform:uppercase; margin-bottom:0.25rem; }
+    .console-v { font-family:var(--font-display); font-size:0.95rem; font-weight:700; line-height:1.1; }
+    .console-v.ok { color:#22c55e; } .console-v.warn { color:#f59e0b; } .console-v.err { color:#ef4444; }
+    .console-v.off { color:#ef4444; } .console-v.muted { opacity:0.6; font-size:0.8rem; }
+    .health-strip { display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+    .health-chip { font-size:0.56rem; font-weight:600; letter-spacing:0.08em; padding:0.25rem 0.6rem;
+      border:1px solid currentColor; text-transform:uppercase; opacity:0.85; }
+    .health-chip.red { border-color:#ef4444; color:#ef4444; opacity:1; }
+    .health-chip.green { border-color:#22c55e; color:#22c55e; opacity:1; }
+    .health-chip.amber { border-color:#f59e0b; color:#f59e0b; opacity:1; }
+
+    /* ── Sticky nav ── */
+    .dash-nav { position:sticky; top:0; z-index:50; display:flex; gap:0.3rem; overflow-x:auto;
+      padding:0.6rem 0; margin-bottom:1.5rem; -webkit-overflow-scrolling:touch;
+      background:var(--bg, #fff); border-bottom:1px solid currentColor; }
+    [data-theme="dark"] .dash-nav { background:#0a0a0a; }
+    [data-theme="light"] .dash-nav { background:#fff; }
+    .dash-nav a { flex:0 0 auto; font-size:0.6rem; font-weight:500; letter-spacing:0.06em;
+      text-transform:uppercase; padding:0.4rem 0.7rem; border:1px solid currentColor; opacity:0.55;
+      text-decoration:none; color:inherit; white-space:nowrap; border-radius:2px; transition:opacity 0.15s; }
+    .dash-nav a:hover, .dash-nav a.active { opacity:1; }
+    /* offset anchors so sticky nav doesn't cover headings */
+    .anchor { scroll-margin-top:64px; }
+    .back-top { font-size:0.58rem; letter-spacing:0.08em; opacity:0.4; text-decoration:none; color:inherit;
+      text-transform:uppercase; display:inline-block; margin:0.5rem 0 2rem; }
+    .back-top:hover { opacity:0.8; }
+
+    /* ── Strategy cards ── */
+    .strat-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:0.8rem; margin-bottom:1.5rem; }
+    .strat-card { border:1px solid currentColor; padding:0.9rem 1.1rem; }
+    .strat-card.paper { border-color:#f59e0b; }
+    .strat-card h4 { font-size:0.78rem; font-weight:600; margin:0 0 0.5rem; display:flex; justify-content:space-between; align-items:center; gap:0.5rem; }
+    .strat-card .tier { font-size:0.52rem; letter-spacing:0.06em; padding:0.1rem 0.45rem; border:1px solid currentColor; opacity:0.6; text-transform:uppercase; }
+    .strat-row { display:flex; justify-content:space-between; font-size:0.7rem; padding:0.2rem 0; opacity:0.8; }
+    .strat-rec { font-size:0.64rem; opacity:0.6; margin-top:0.5rem; line-height:1.4; font-style:italic; }
+
+    /* ── Chart ── */
+    .chart-wrap { border:1px solid currentColor; padding:1.1rem 1.2rem; margin-bottom:1.5rem; }
+    .chart-empty { font-size:0.72rem; opacity:0.4; font-style:italic; padding:1.5rem 0; text-align:center; }
+    .bar-row { display:flex; align-items:center; gap:0.7rem; margin:0.4rem 0; font-size:0.7rem; }
+    .bar-label { flex:0 0 130px; opacity:0.7; }
+    .bar-track { flex:1; height:14px; background:currentColor; opacity:0.1; position:relative; border-radius:2px; }
+    .bar-fill { position:absolute; top:0; height:100%; border-radius:2px; }
+    .bar-val { flex:0 0 64px; text-align:right; font-feature-settings:"tnum"; }
+
+    /* ── Data quality panel ── */
+    .dq-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1px; border:1px solid currentColor; margin-bottom:1rem; }
+    .dq-cell { padding:0.6rem 0.85rem; border:1px solid currentColor; }
+    .dq-k { font-size:0.55rem; letter-spacing:0.08em; opacity:0.45; text-transform:uppercase; margin-bottom:0.2rem; }
+    .dq-v { font-size:0.78rem; }
+    .dq-note { font-size:0.66rem; opacity:0.55; line-height:1.6; margin-top:0.5rem; }
   </style>
 </head>
 <body>
@@ -252,15 +308,51 @@
         <div class="bot-eyebrow">PRIVATE — AUTHORIZED</div>
         <h1 class="bot-title">TRADING<br>BOT.</h1>
 
-        <!-- ════════ HYBRID OVERVIEW ════════ -->
-        <div class="hybrid-banner">
-          <span class="hybrid-dot"></span>
-          <span class="hybrid-state">HYBRID MODE · CORE ALLOCATION + RESEARCH LANE</span>
-          <span class="hybrid-meta">LIVE TRADING DISABLED · PAPER / RECOMMENDATION ONLY</span>
+        <!-- ════════ OVERVIEW / OPERATING CONSOLE ════════ -->
+        <div id="overview" class="anchor"></div>
+        <div class="health-strip">
+          <span class="health-chip red">LIVE TRADING DISABLED</span>
+          <span class="health-chip">ALPACA PAPER</span>
+          <span class="health-chip green">CORE CAPITAL PROTECTED</span>
+          <span class="health-chip amber">DAY-TRADING PAPER EXPERIMENTAL</span>
+          <span class="health-chip">ORB 15M ONLY PAPER-ENABLED</span>
+          <span class="health-chip">OTHER STRATEGIES SHADOW-ONLY</span>
+          <span class="health-chip green">AI NOT IN EXECUTION PATH</span>
+        </div>
+
+        <!-- Sticky nav -->
+        <nav class="dash-nav" id="dash-nav">
+          <a href="#overview">Overview</a>
+          <a href="#core-allocation">Core Allocation</a>
+          <a href="#day-trading">Day-Trading</a>
+          <a href="#paper-orders">Paper Orders</a>
+          <a href="#daily-report">Daily Report</a>
+          <a href="#weekly-report">Weekly Report</a>
+          <a href="#strategy-performance">Strategy Perf</a>
+          <a href="#charts">Charts</a>
+          <a href="#data-quality">Data Quality</a>
+          <a href="#archived-research">Archived</a>
+          <a href="#legacy-telemetry">Legacy</a>
+        </nav>
+
+        <!-- Status console -->
+        <div class="console-bar" id="console-bar">
+          <div class="console-cell"><div class="console-k">System</div><div class="console-v muted">Hybrid Alpaca Paper Bot</div></div>
+          <div class="console-cell"><div class="console-k">Live Trading</div><div class="console-v off">DISABLED</div></div>
+          <div class="console-cell"><div class="console-k">Broker Mode</div><div class="console-v muted">Alpaca Paper</div></div>
+          <div class="console-cell"><div class="console-k">Core Engine</div><div class="console-v ok" id="con-core">ACTIVE</div></div>
+          <div class="console-cell"><div class="console-k">Day-Trading</div><div class="console-v warn" id="con-dt">ACTIVE RESEARCH</div></div>
+          <div class="console-cell"><div class="console-k">Paper Orders</div><div class="console-v muted" id="con-po">—</div></div>
+          <div class="console-cell"><div class="console-k">Paper Armed</div><div class="console-v muted" id="con-armed">—</div></div>
+          <div class="console-cell"><div class="console-k">Trade Today</div><div class="console-v muted" id="con-trade">—</div></div>
+          <div class="console-cell"><div class="console-k">Data Source</div><div class="console-v muted" id="con-data">—</div></div>
+          <div class="console-cell"><div class="console-k">Last Update</div><div class="console-v muted" id="con-update">—</div></div>
+          <div class="console-cell"><div class="console-k">Health</div><div class="console-v muted" id="con-health">—</div></div>
         </div>
 
         <!-- ════════ ① CORE ALLOCATION ENGINE (primary) ════════ -->
-        <div class="section-label">① CORE ALLOCATION ENGINE
+        <div id="core-allocation" class="anchor"></div>
+        <div class="section-label">① CORE ALLOCATION ENGINE · WORKING CORE
           <span class="sublabel" id="core-asof">the working system · Candidate E</span></div>
         <div class="data-source-row">
           <span class="ds-badge" id="ds-badge">DATA SOURCE: —</span>
@@ -295,8 +387,9 @@
         </div>
 
         <!-- ════════ ② EXPERIMENTAL DAY-TRADING RESEARCH (secondary) ════════ -->
-        <div class="section-label">② EXPERIMENTAL DAY-TRADING RESEARCH
-          <span class="sublabel" id="dt-asof">active shadow research · shadow only</span></div>
+        <div id="day-trading" class="anchor"></div>
+        <div class="section-label">② EXPERIMENTAL DAY-TRADING RESEARCH · PAPER EXPERIMENTAL
+          <span class="sublabel" id="dt-asof">active continuous research loop</span></div>
         <div class="exp-wrap">
           <div class="exp-head">
             <span class="exp-pill" id="dt-mode">PAPER EXPERIMENTAL</span>
@@ -336,19 +429,87 @@
             </div>
           </div>
           <div class="exp-warn">⚠ PAPER EXPERIMENTAL ONLY. LIVE TRADING DISABLED. DOES NOT USE CORE ALLOCATION CAPITAL. Paper orders require explicit arming + a verified Alpaca paper account; until armed, the engine only logs the orders it would place.</div>
-          <div class="dt-reports">
-            <div class="stat-label" style="margin-top:0.4rem;">Latest daily research note</div>
-            <div class="exp-val" id="dt-daily" style="font-size:0.72rem; line-height:1.5;">—</div>
-            <div class="stat-label" style="margin-top:0.7rem;">Weekly evidence summary</div>
-            <div class="exp-val" id="dt-weekly" style="font-size:0.72rem; line-height:1.5;">—</div>
-            <div class="stat-label" style="margin-top:0.7rem;">AI research memo <span style="opacity:0.5;">(optional, analysis-only)</span></div>
-            <div class="exp-val" id="dt-memo" style="font-size:0.72rem; line-height:1.5;">—</div>
-          </div>
         </div>
+        <a href="#overview" class="back-top">↑ Back to top</a>
+
+        <!-- ════════ PAPER ORDERS ════════ -->
+        <div id="paper-orders" class="anchor"></div>
+        <div class="section-label">③ PAPER ORDERS · ALPACA PAPER
+          <span class="sublabel">ORB 15m only · live disabled · no core capital</span></div>
+        <div class="dq-grid">
+          <div class="dq-cell"><div class="dq-k">Open position</div><div class="dq-v" id="po-open">none</div></div>
+          <div class="dq-cell"><div class="dq-k">Today's paper trades</div><div class="dq-v" id="po-today">0</div></div>
+          <div class="dq-cell"><div class="dq-k">Last order</div><div class="dq-v" id="po-last">none yet</div></div>
+          <div class="dq-cell"><div class="dq-k">Last refusal</div><div class="dq-v" id="po-refusal">none</div></div>
+          <div class="dq-cell"><div class="dq-k">EOD exit status</div><div class="dq-v" id="po-eod">—</div></div>
+          <div class="dq-cell"><div class="dq-k">Realized R today</div><div class="dq-v" id="po-realized">0</div></div>
+        </div>
+        <a href="#overview" class="back-top">↑ Back to top</a>
+
+        <!-- ════════ DAILY REPORT ════════ -->
+        <div id="daily-report" class="anchor"></div>
+        <div class="section-label">④ DAILY RESEARCH REPORT
+          <span class="sublabel" id="daily-date">deterministic · no AI</span></div>
+        <div class="memo-box" id="daily-box" style="margin-bottom:1rem;"><div class="memo-empty">Daily report will populate after the next market session.</div></div>
+        <a href="#overview" class="back-top">↑ Back to top</a>
+
+        <!-- ════════ WEEKLY REPORT ════════ -->
+        <div id="weekly-report" class="anchor"></div>
+        <div class="section-label">⑤ WEEKLY EVIDENCE SUMMARY
+          <span class="sublabel">per-strategy expectancy + evidence tier</span></div>
+        <div class="memo-box" id="weekly-box" style="margin-bottom:1rem;"><div class="memo-empty">Weekly report will populate after enough sessions.</div></div>
+        <!-- Optional AI memo -->
+        <div class="section-label" style="margin-top:1rem;">AI RESEARCH MEMO
+          <span class="sublabel">optional · analysis only, not execution</span></div>
+        <div class="memo-box" id="aimemo-box" style="margin-bottom:1rem;"><div class="memo-empty">—</div></div>
+        <a href="#overview" class="back-top">↑ Back to top</a>
+
+        <!-- ════════ STRATEGY PERFORMANCE ════════ -->
+        <div id="strategy-performance" class="anchor"></div>
+        <div class="section-label">⑥ STRATEGY PERFORMANCE
+          <span class="sublabel">ORB 15m = paper experimental · others = shadow only</span></div>
+        <div class="strat-cards" id="strat-cards">
+          <div class="chart-empty" style="grid-column:1/-1;">Loading strategy stats…</div>
+        </div>
+        <a href="#overview" class="back-top">↑ Back to top</a>
+
+        <!-- ════════ CHARTS ════════ -->
+        <div id="charts" class="anchor"></div>
+        <div class="section-label">⑦ CHARTS
+          <span class="sublabel">only what the data supports</span></div>
+        <div class="chart-wrap">
+          <div class="stat-label" style="margin-bottom:0.8rem;">Shadow setups by strategy (count)</div>
+          <div id="chart-setups"><div class="chart-empty">Not enough data yet. Chart will populate after more market sessions.</div></div>
+        </div>
+        <div class="chart-wrap">
+          <div class="stat-label" style="margin-bottom:0.8rem;">Average R by strategy (net, after costs)</div>
+          <div id="chart-expectancy"><div class="chart-empty">Not enough data yet. Chart will populate after more market sessions.</div></div>
+          <div class="dq-note">Paper P&amp;L chart intentionally omitted until paper trades exist. Shadow R is a research estimate, not realized money.</div>
+        </div>
+        <a href="#overview" class="back-top">↑ Back to top</a>
+
+        <!-- ════════ DATA QUALITY ════════ -->
+        <div id="data-quality" class="anchor"></div>
+        <div class="section-label">⑧ DATA QUALITY
+          <span class="sublabel">market-data sourcing for research</span></div>
+        <div class="dq-grid">
+          <div class="dq-cell"><div class="dq-k">Primary source</div><div class="dq-v">Alpaca IEX</div></div>
+          <div class="dq-cell"><div class="dq-k">Supplemental</div><div class="dq-v">none</div></div>
+          <div class="dq-cell"><div class="dq-k">Feed</div><div class="dq-v">IEX (not SIP)</div></div>
+          <div class="dq-cell"><div class="dq-k">Bar interval</div><div class="dq-v">5-minute</div></div>
+          <div class="dq-cell"><div class="dq-k">Latest bar</div><div class="dq-v" id="dq-bar">—</div></div>
+          <div class="dq-cell"><div class="dq-k">Data stale?</div><div class="dq-v" id="dq-stale">—</div></div>
+          <div class="dq-cell"><div class="dq-k">Bid/ask</div><div class="dq-v">limited (IEX)</div></div>
+          <div class="dq-cell"><div class="dq-k">Trade stream</div><div class="dq-v">not wired</div></div>
+          <div class="dq-cell"><div class="dq-k">Level 2 depth</div><div class="dq-v">unavailable</div></div>
+        </div>
+        <div class="dq-note">IEX-only, partial-market data, sufficient for ORB research but not full microstructure. No full order book imbalance available. Microstructure-lite stays a label/veto concept, not a live feed, until a supplemental tape is added. See the data-source audit (delivered separately) for the recommended next supplement to test.</div>
+        <a href="#overview" class="back-top">↑ Back to top</a>
 
         <!-- ════════ ARCHIVED RESEARCH (collapsed) ════════ -->
+        <div id="archived-research" class="anchor"></div>
         <details class="arch-wrap">
-          <summary>ARCHIVED RESEARCH — 9 tested &amp; rejected strategies (not active)</summary>
+          <summary>⑨ ARCHIVED RESEARCH — 9 tested &amp; rejected strategies (not active)</summary>
           <div class="arch-item"><b>Daily momentum (RSI/ATR scorer)</b> — REJECTED · negative out-of-sample after realistic execution</div>
           <div class="arch-item"><b>FVG trigger</b> — REJECTED · diffuse failure, no predictive entry value</div>
           <div class="arch-item"><b>Gap-and-hold continuation</b> — REJECTED · positive raw but negative tailwind-adjusted</div>
@@ -360,10 +521,13 @@
           <div class="arch-item"><b>Dual momentum allocation</b> — RESEARCH-ONLY · underperformed the simple monthly rule</div>
         </details>
 
-        <div class="section-label" style="margin-top:1rem;">LEGACY BOT TELEMETRY
-          <span class="sublabel">heartbeat &amp; raw decision log (archived engine)</span></div>
+        <!-- ════════ LEGACY TELEMETRY (collapsed) ════════ -->
+        <div id="legacy-telemetry" class="anchor"></div>
+        <details class="arch-wrap">
+          <summary>⑩ LEGACY BOT TELEMETRY / HISTORICAL LOGS — archived AI engine (not the active system)</summary>
+          <div class="arch-item" style="opacity:0.6;">The sections below are from the retired AI stock-picking engine, kept only for debugging. They are NOT the active trading system. The active system is the Core Allocation Engine + the day-trading research lane above.</div>
 
-        <div class="refresh-row">
+        <div class="refresh-row" style="margin-top:1rem;">
           <div class="last-updated" id="last-updated">Loading...</div>
           <div style="display:flex;gap:0.6rem;">
             <button class="btn-sm" onclick="fetchData()">REFRESH</button>
@@ -477,6 +641,7 @@
             <tbody id="log-historical-body"><tr><td colspan="9" class="dim">Loading prior sessions...</td></tr></tbody>
           </table>
         </div>
+        </details>
       </div>
 
     </div>
@@ -574,8 +739,45 @@
     function showDashboard() {
       document.getElementById("auth-screen").style.display = "none";
       document.getElementById("dashboard").style.display  = "block";
+      setupDashNav();
       fetchData(true);
       _refreshTimer = setInterval(() => fetchData(false), 30000);
+    }
+
+    // Sticky nav: smooth scroll + active-section highlight
+    function setupDashNav() {
+      const nav = document.getElementById("dash-nav");
+      if (!nav || nav._wired) return;
+      nav._wired = true;
+      const links = [...nav.querySelectorAll("a")];
+      links.forEach(a => {
+        a.addEventListener("click", e => {
+          e.preventDefault();
+          const id = a.getAttribute("href").slice(1);
+          const el = document.getElementById(id);
+          if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+      // highlight the section nearest the top as you scroll
+      const ids = links.map(a => a.getAttribute("href").slice(1));
+      window.addEventListener("scroll", () => {
+        let current = ids[0];
+        for (const id of ids) {
+          const el = document.getElementById(id);
+          if (el && el.getBoundingClientRect().top <= 90) current = id;
+        }
+        links.forEach(a => a.classList.toggle("active", a.getAttribute("href") === "#" + current));
+      }, { passive: true });
+    }
+
+    // Overall health chip in the console, driven by the heartbeat state.
+    function setConsoleHealth(state) {
+      const el = document.getElementById("con-health");
+      if (!el) return;
+      if (state === "RUNNING") { el.textContent = "OK"; el.className = "console-v ok"; }
+      else if (state === "STALE") { el.textContent = "WARNING"; el.className = "console-v warn"; }
+      else if (state === "DEAD") { el.textContent = "ERROR"; el.className = "console-v err"; }
+      else { el.textContent = "—"; el.className = "console-v muted"; }
     }
 
     // ── Data ──────────────────────────────────────────────────────
@@ -658,6 +860,11 @@
         if (source === "live") { badge.textContent = "DATA SOURCE: LIVE RAILWAY ENDPOINT"; badge.className = "ds-badge live"; }
         else { badge.textContent = "DATA SOURCE: STATIC FALLBACK (core_status.json)"; badge.className = "ds-badge fallback"; }
       }
+      const conData = document.getElementById("con-data");
+      if (conData) {
+        conData.textContent = source === "live" ? "live endpoint" : (source === "fallback" ? "fallback" : "unavailable");
+        conData.className = "console-v " + (source === "live" ? "ok" : "warn");
+      }
       // staleness: prefer endpoint's own flag; else compute from loop_updated_at/as_of
       let stale = !!s.data_stale;
       const stamp = s.loop_updated_at || s.as_of;
@@ -696,6 +903,67 @@
       trend_day_continuation: "Trend day continuation",
       range_day_mean_reversion: "Range-day mean reversion",
     };
+
+    // Strategy performance cards + bar charts, from the shadow report (d.report).
+    function renderStratCards(d) {
+      const rep = d.report || {};
+      const cards = document.getElementById("strat-cards");
+      const PAPER = "opening_range_breakout";
+      const order = ["opening_range_breakout","vwap_reclaim","trend_day_continuation","range_day_mean_reversion"];
+      if (cards) {
+        let html = "";
+        order.forEach(k => {
+          const m = rep[k];
+          const label = DT_LABELS[k] || k;
+          const isPaper = (k === PAPER);
+          const statusLabel = isPaper ? "PAPER EXPERIMENTAL" : "SHADOW ONLY";
+          if (!m || !m.n) {
+            html += `<div class="strat-card${isPaper?' paper':''}"><h4>${label}<span class="tier">${statusLabel}</span></h4>` +
+              `<div class="strat-rec">Not enough data yet. Keep collecting.</div></div>`;
+            return;
+          }
+          const col = m.expectancy_r > 0 ? "#22c55e" : "#ef4444";
+          const tier = (m.evidence_tier || "smoke_test_only").replace(/_/g," ");
+          html += `<div class="strat-card${isPaper?' paper':''}">` +
+            `<h4>${label}<span class="tier">${statusLabel}</span></h4>` +
+            `<div class="strat-row"><span>Shadow setups</span><span>${m.n}</span></div>` +
+            (isPaper ? `<div class="strat-row"><span>Paper trades</span><span>${(d.paper&&d.paper.trades_today!=null)?(d.paper.total_paper_trades||0):0}</span></div>` : "") +
+            `<div class="strat-row"><span>Avg R (net)</span><span style="color:${col};">${m.expectancy_r>0?'+':''}${m.expectancy_r}R</span></div>` +
+            `<div class="strat-row"><span>Win rate</span><span>${Math.round((m.win_rate||0)*100)}%</span></div>` +
+            (m.avg_mfe_r!=null?`<div class="strat-row"><span>MFE / MAE</span><span>${m.avg_mfe_r} / ${m.avg_mae_r}</span></div>`:"") +
+            (m.beat_random!=null?`<div class="strat-row"><span>vs random</span><span>${m.beat_random?"beats":"does not beat"}</span></div>`:"") +
+            `<div class="strat-row"><span>Evidence</span><span>${tier}</span></div>` +
+            `<div class="strat-rec">${m.recommendation || (m.expectancy_r<0?"Negative so far. Keep collecting.":"Keep collecting.")}</div></div>`;
+        });
+        cards.innerHTML = html;
+      }
+
+      // bar charts (only when we have data)
+      const entries = order.map(k => [k, rep[k]]).filter(([k,m]) => m && m.n);
+      const setupsHost = document.getElementById("chart-setups");
+      const expHost = document.getElementById("chart-expectancy");
+      if (entries.length && setupsHost) {
+        const maxN = Math.max(...entries.map(([k,m]) => m.n));
+        setupsHost.innerHTML = entries.map(([k,m]) => {
+          const w = Math.round(100 * m.n / maxN);
+          return `<div class="bar-row"><span class="bar-label">${DT_LABELS[k]||k}</span>` +
+            `<span class="bar-track"><span class="bar-fill" style="width:${w}%;background:#3b82f6;"></span></span>` +
+            `<span class="bar-val">${m.n}</span></div>`;
+        }).join("");
+      }
+      if (entries.length && expHost) {
+        const maxAbs = Math.max(...entries.map(([k,m]) => Math.abs(m.expectancy_r))) || 1;
+        expHost.innerHTML = entries.map(([k,m]) => {
+          const w = Math.round(100 * Math.abs(m.expectancy_r) / maxAbs);
+          const col = m.expectancy_r >= 0 ? "#22c55e" : "#ef4444";
+          const small = m.n < 100 ? ' <span style="opacity:0.5;">(small sample)</span>' : '';
+          return `<div class="bar-row"><span class="bar-label">${DT_LABELS[k]||k}</span>` +
+            `<span class="bar-track"><span class="bar-fill" style="width:${w}%;background:${col};"></span></span>` +
+            `<span class="bar-val" style="color:${col};">${m.expectancy_r>0?'+':''}${m.expectancy_r}R${small}</span></div>`;
+        }).join("");
+      }
+    }
+
     async function renderDaytrading() {
       let d = null;
       try {
@@ -733,25 +1001,79 @@
       set("dt-total", d.setups_logged_total != null ? d.setups_logged_total : 0);
       set("dt-today", d.setups_logged_today != null ? d.setups_logged_today : 0);
       set("dt-promoted", d.any_promoted ? "see report" : "NONE");
-      // daily/weekly reports + optional AI memo
+
+      // ── Top console bar ──
+      set("con-po", p.paper_orders_enabled ? "ON" : "OFF");
+      const conPo = document.getElementById("con-po"); if (conPo) conPo.className = "console-v " + (p.paper_orders_enabled ? "ok" : "off");
+      set("con-armed", armed ? "YES" : "NO");
+      const conArmed = document.getElementById("con-armed"); if (conArmed) conArmed.className = "console-v " + (armed ? "warn" : "muted");
+      const tradedToday = (p.trades_today || 0) > 0;
+      set("con-trade", tradedToday ? `YES (${p.trades_today})` : "none yet");
+      set("con-dt", (sc.scanner_status || "ACTIVE RESEARCH").replace(/_/g," "));
+
+      // ── Paper orders section ──
+      set("po-open", (p.open_positions && p.open_positions > 0) ? `${p.open_positions} open` : "none");
+      set("po-today", p.trades_today != null ? p.trades_today : 0);
+      set("po-last", lo ? `${lo.symbol||""} · ${lo.status||""}${lo.submitted? " (submitted)" : " (dry-run)"}` : "none yet");
+      set("po-refusal", (sc.last_refusal || p.last_refusal || "none"));
+      set("po-eod", sc.eod_exit_status || "—");
+      set("po-realized", p.today_realized_r != null ? p.today_realized_r : 0);
+
+      // ── Daily report box ──
       const dr = d.daily_report;
-      if (dr) {
-        set("dt-daily", `${dr.date||""}: ${dr.shadow_setups_today||0} shadow setups, ${dr.paper_trades_today||0} paper trades` +
-          (dr.best_setup ? ` · best ${dr.best_setup.strategy} ${dr.best_setup.final_r>0?'+':''}${dr.best_setup.final_r}R` : "") +
-          (dr.last_refusal ? ` · refusal: ${dr.last_refusal}` : ""));
+      const dailyBox = document.getElementById("daily-box");
+      if (dr && dailyBox) {
+        set("daily-date", dr.date || "");
+        let t = `${dr.date || ""}\n`;
+        t += `Market session: ${dr.market_session || "—"} · scanner: ${(dr.scanner_status||"—").replace(/_/g," ")}\n`;
+        t += `Paper trades today: ${dr.paper_trades_today || 0}\n`;
+        t += `Shadow setups today: ${dr.shadow_setups_today || 0}\n`;
+        if (dr.best_setup) t += `Best setup: ${dr.best_setup.strategy} ${dr.best_setup.final_r>0?'+':''}${dr.best_setup.final_r}R\n`;
+        if (dr.worst_setup) t += `Worst setup: ${dr.worst_setup.strategy} ${dr.worst_setup.final_r}R\n`;
+        if (dr.data_issues) t += `Data issues: ${dr.data_issues}\n`;
+        if (dr.last_refusal) t += `Safety refusal: ${dr.last_refusal}\n`;
+        if (dr.next_day_watch) t += `Next watch: ${dr.next_day_watch}`;
+        dailyBox.textContent = t;
       }
+
+      // ── Weekly report box ──
       const wr = d.weekly_report;
-      if (wr && wr.per_strategy) {
-        const parts = Object.entries(wr.per_strategy).map(([k,m]) =>
-          `${k.replace(/_/g," ")}: n=${m.n}, ${m.expectancy_r>0?'+':''}${m.expectancy_r}R (${m.evidence_tier||""})`);
-        set("dt-weekly", `${wr.shadow_setups_total||0} total setups. ` + parts.join(" · "));
+      const weeklyBox = document.getElementById("weekly-box");
+      if (wr && weeklyBox) {
+        let t = `Week ending ${wr.week_ending || "—"}\n`;
+        t += `Total shadow setups: ${wr.shadow_setups_total || 0} (this week: ${wr.shadow_setups_this_week || 0})\n`;
+        if (wr.paper) t += `Paper trades submitted: ${wr.paper.total_paper_trades_submitted || 0} · tier: ${wr.paper.evidence_tier || "—"}\n`;
+        t += `\nPer-strategy:\n`;
+        if (wr.per_strategy) {
+          for (const [k,m] of Object.entries(wr.per_strategy)) {
+            t += `· ${k.replace(/_/g," ")}: n=${m.n}, ${m.expectancy_r>0?'+':''}${m.expectancy_r}R, win ${Math.round((m.win_rate||0)*100)}% — ${m.evidence_tier||""}\n   → ${m.recommendation||""}\n`;
+          }
+        }
+        if (wr.promotion_note) t += `\n${wr.promotion_note}`;
+        weeklyBox.textContent = t;
       }
+
+      // ── AI memo box ──
       const memo = d.ai_memo;
-      if (memo) {
-        if (memo.status === "ok" && memo.memo) set("dt-memo", memo.memo.slice(0, 600));
-        else if (memo.status === "disabled") set("dt-memo", "Disabled (non-AI reports still produced). Enable via DAYTRADING_AI_MEMO_ENABLED.");
-        else set("dt-memo", "Not available — " + (memo.status || "none"));
+      const aimemoBox = document.getElementById("aimemo-box");
+      if (memo && aimemoBox) {
+        if (memo.status === "ok" && memo.memo) {
+          aimemoBox.textContent = memo.memo + "\n\n— Research analysis only, not execution.";
+        } else if (memo.status === "disabled") {
+          aimemoBox.innerHTML = `<div class="memo-empty">AI research memo disabled. Deterministic reports still active.</div>`;
+        } else {
+          aimemoBox.innerHTML = `<div class="memo-empty">AI research memo not available (${memo.status||"none"}). Deterministic reports still active.</div>`;
+        }
       }
+
+      // ── Strategy performance cards + charts ──
+      renderStratCards(d);
+
+      // ── Data quality timestamps ──
+      const ranges = sc.opening_ranges || {};
+      const firstSym = Object.keys(ranges)[0];
+      set("dq-bar", sc.et_time || "—");
+      set("dq-stale", sc.scanner_status === "OUTSIDE_MARKET_HOURS" ? "market closed" : "no");
       const rep = d.report || {};
       const host = document.getElementById("dt-strats");
       if (host) {
@@ -794,6 +1116,10 @@
         meta = `Last heartbeat ${ago} · Watchlist ${status.watchlist_size ?? "?"} · Active ${status.active_data_count ?? "?"}`;
       }
       setLive(cls, label, meta);
+      // mirror into the operating console
+      setConsoleHealth(state);
+      const upd = document.getElementById("con-update");
+      if (upd) upd.textContent = new Date().toLocaleTimeString();
     }
 
     function fmtMoney(v) {
