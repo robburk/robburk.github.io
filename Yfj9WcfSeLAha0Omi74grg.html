@@ -385,6 +385,12 @@
           </div>
           <div class="bt-note">Rule: monthly — hold SPY if SPY&gt;200-day AND 50-day≥200-day, else SHY. &nbsp;vs SPY buy &amp; hold: 10.8% CAGR but −55% max drawdown.</div>
         </div>
+        <div class="chart-wrap">
+          <div class="stat-label" style="margin-bottom:0.8rem;">SPY vs 50-day &amp; 200-day MA · current state <span id="core-chart-state" style="opacity:0.7;"></span></div>
+          <div id="core-chart"><div class="chart-empty">Loading price history…</div></div>
+          <div class="dq-note"><span style="color:#3b82f6;">━</span> SPY &nbsp; <span style="color:#f59e0b;">━</span> 50-day MA &nbsp; <span style="color:#ef4444;">━</span> 200-day MA. Risk-on when SPY is above the 200-day and the 50-day is above the 200-day.</div>
+        </div>
+        <a href="#overview" class="back-top">↑ Back to top</a>
 
         <!-- ════════ ② EXPERIMENTAL DAY-TRADING RESEARCH (secondary) ════════ -->
         <div id="day-trading" class="anchor"></div>
@@ -494,13 +500,13 @@
           <span class="sublabel">market-data sourcing for research</span></div>
         <div class="dq-grid">
           <div class="dq-cell"><div class="dq-k">Primary source</div><div class="dq-v">Alpaca IEX</div></div>
-          <div class="dq-cell"><div class="dq-k">Supplemental</div><div class="dq-v">none</div></div>
+          <div class="dq-cell"><div class="dq-k">Supplemental</div><div class="dq-v" id="dq-supp">none</div></div>
           <div class="dq-cell"><div class="dq-k">Feed</div><div class="dq-v">IEX (not SIP)</div></div>
           <div class="dq-cell"><div class="dq-k">Bar interval</div><div class="dq-v">5-minute</div></div>
           <div class="dq-cell"><div class="dq-k">Latest bar</div><div class="dq-v" id="dq-bar">—</div></div>
           <div class="dq-cell"><div class="dq-k">Data stale?</div><div class="dq-v" id="dq-stale">—</div></div>
           <div class="dq-cell"><div class="dq-k">Bid/ask</div><div class="dq-v">limited (IEX)</div></div>
-          <div class="dq-cell"><div class="dq-k">Trade stream</div><div class="dq-v">not wired</div></div>
+          <div class="dq-cell"><div class="dq-k">Trade stream</div><div class="dq-v" id="dq-tape">not wired</div></div>
           <div class="dq-cell"><div class="dq-k">Level 2 depth</div><div class="dq-v">unavailable</div></div>
         </div>
         <div class="dq-note">IEX-only, partial-market data, sufficient for ORB research but not full microstructure. No full order book imbalance available. Microstructure-lite stays a label/veto concept, not a live feed, until a supplemental tape is added. See the data-source audit (delivered separately) for the recommended next supplement to test.</div>
@@ -834,6 +840,41 @@
 
     // Core Allocation Engine (Candidate E). Tries the API, falls back to a
     // published core_status.json next to this page. Recommendation-only.
+    function renderCoreChart(s) {
+      const host = document.getElementById("core-chart");
+      const stEl = document.getElementById("core-chart-state");
+      if (!host) return;
+      const h = s && s.price_history;
+      if (!h || h.length < 5) {
+        host.innerHTML = `<div class="chart-empty">Not enough price history yet. Chart will populate once the endpoint publishes history.</div>`;
+        return;
+      }
+      const W = 700, H = 220, padL = 44, padR = 12, padT = 12, padB = 22;
+      const xs = h.map(p => p.i);
+      const all = h.flatMap(p => [p.c, p.ma50, p.ma200]);
+      const lo = Math.min(...all), hi = Math.max(...all);
+      const xmin = Math.min(...xs), xmax = Math.max(...xs);
+      const X = i => padL + (xmax === xmin ? 0 : (i - xmin) / (xmax - xmin)) * (W - padL - padR);
+      const Y = v => padT + (hi === lo ? 0.5 : (hi - v) / (hi - lo)) * (H - padT - padB);
+      const line = (key, col) => {
+        const d = h.map((p, idx) => (idx ? "L" : "M") + X(p.i).toFixed(1) + "," + Y(p[key]).toFixed(1)).join(" ");
+        return `<path d="${d}" fill="none" stroke="${col}" stroke-width="1.6"/>`;
+      };
+      const riskOn = s.mode === "RISK_ON";
+      if (stEl) { stEl.textContent = "· " + (s.mode || ""); stEl.style.color = riskOn ? "#22c55e" : "#3b82f6"; }
+      // y-axis ticks (low, mid, high)
+      const ticks = [lo, (lo+hi)/2, hi].map(v =>
+        `<text x="4" y="${(Y(v)+3).toFixed(1)}" font-size="9" fill="currentColor" opacity="0.5">${v.toFixed(0)}</text>`).join("");
+      const svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" preserveAspectRatio="xMidYMid meet" style="overflow:visible;">
+        ${ticks}
+        ${line("ma200", "#ef4444")}
+        ${line("ma50", "#f59e0b")}
+        ${line("c", "#3b82f6")}
+        <circle cx="${X(h[h.length-1].i).toFixed(1)}" cy="${Y(h[h.length-1].c).toFixed(1)}" r="3.5" fill="${riskOn ? '#22c55e' : '#3b82f6'}"/>
+      </svg>`;
+      host.innerHTML = svg;
+    }
+
     async function renderHybrid() {
       let s = null, source = "none";
       try {
@@ -894,6 +935,7 @@
       }
       set("core-last", s.last_monthly_check || "—");
       set("core-next", s.next_monthly_check || "—");
+      renderCoreChart(s);
     }
 
     // Engine 2 — day-trading shadow research. Tries endpoint, falls back to JSON.
@@ -1074,6 +1116,16 @@
       const firstSym = Object.keys(ranges)[0];
       set("dq-bar", sc.et_time || "—");
       set("dq-stale", sc.scanner_status === "OUTSIDE_MARKET_HOURS" ? "market closed" : "no");
+      // supplemental data (Finnhub tape) status
+      const supp = d.supplemental_data;
+      const tape = supp && supp.finnhub_tape;
+      if (tape && tape.enabled) {
+        set("dq-supp", tape.status === "connected" ? "Finnhub (connected)" : "Finnhub (" + (tape.status||"") + ")");
+        set("dq-tape", tape.connected ? "connected" : "enabled, no data yet");
+      } else {
+        set("dq-supp", "none");
+        set("dq-tape", tape ? "Finnhub disabled/missing key" : "not wired");
+      }
       const rep = d.report || {};
       const host = document.getElementById("dt-strats");
       if (host) {
