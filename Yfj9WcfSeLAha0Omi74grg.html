@@ -94,6 +94,13 @@
     .hybrid-meta { margin-left:auto; color:#ef4444; font-size:0.66rem; letter-spacing:0.08em; }
     .core-wrap { border:2px solid #22c55e; margin-bottom:1.25rem; }
     .core-main { padding:1.25rem 1.5rem; border-bottom:1px solid currentColor; }
+    .data-source-row { display:flex; gap:0.75rem; align-items:center; margin-bottom:1rem; flex-wrap:wrap; }
+    .ds-badge { font-size:0.6rem; font-weight:600; letter-spacing:0.08em; padding:0.25rem 0.7rem;
+      border:1px solid currentColor; opacity:0.75; text-transform:uppercase; }
+    .ds-badge.live { border-color:#22c55e; color:#22c55e; opacity:1; }
+    .ds-badge.fallback { border-color:#f59e0b; color:#f59e0b; opacity:1; }
+    .ds-badge.down { border-color:#ef4444; color:#ef4444; opacity:1; }
+    .ds-stale { font-size:0.62rem; color:#f59e0b; letter-spacing:0.04em; }
     .core-mode { font-family:var(--font-display); font-size:2.6rem; font-weight:700; line-height:1; margin:0.3rem 0; }
     .core-reason { font-size:0.8rem; opacity:0.65; line-height:1.6; }
     .core-grid { margin-bottom:0; border:0; border-top:0; }
@@ -255,6 +262,10 @@
         <!-- ════════ ① CORE ALLOCATION ENGINE (primary) ════════ -->
         <div class="section-label">① CORE ALLOCATION ENGINE
           <span class="sublabel" id="core-asof">the working system · Candidate E</span></div>
+        <div class="data-source-row">
+          <span class="ds-badge" id="ds-badge">DATA SOURCE: —</span>
+          <span class="ds-stale" id="ds-stale"></span>
+        </div>
         <div class="core-wrap">
           <div class="core-main">
             <div class="stat-label">Current Mode</div>
@@ -599,22 +610,41 @@
     // Core Allocation Engine (Candidate E). Tries the API, falls back to a
     // published core_status.json next to this page. Recommendation-only.
     async function renderHybrid() {
-      let s = null;
+      let s = null, source = "none";
       try {
         const r = await fetch(`${API}/api/core_allocation?token=${_token}`);
-        if (r.ok) s = await r.json();
+        if (r.ok) { s = await r.json(); if (s && s.data_ok) source = "live"; }
       } catch(e) {}
-      if (!s) {
+      if (!s || !s.data_ok) {
         try {
           const r2 = await fetch(`core_status.json?t=${Date.now()}`);
-          if (r2.ok) s = await r2.json();
+          if (r2.ok) { s = await r2.json(); source = "fallback"; }
         } catch(e) {}
       }
       const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+      const badge = document.getElementById("ds-badge");
+      const staleEl = document.getElementById("ds-stale");
+      if (staleEl) staleEl.textContent = "";
       if (!s || !s.data_ok) {
+        if (badge) { badge.textContent = "DATA SOURCE: UNAVAILABLE"; badge.className = "ds-badge down"; }
         set("core-mode", "—");
-        set("core-reason", "Core allocation signal unavailable. Publish core_status.json next to this page, or add /api/core_allocation to the worker.");
+        set("core-reason", "Core allocation signal unavailable. The Railway endpoint and the static fallback both failed or returned no data.");
         return;
+      }
+      if (badge) {
+        if (source === "live") { badge.textContent = "DATA SOURCE: LIVE RAILWAY ENDPOINT"; badge.className = "ds-badge live"; }
+        else { badge.textContent = "DATA SOURCE: STATIC FALLBACK (core_status.json)"; badge.className = "ds-badge fallback"; }
+      }
+      // staleness: prefer endpoint's own flag; else compute from loop_updated_at/as_of
+      let stale = !!s.data_stale;
+      const stamp = s.loop_updated_at || s.as_of;
+      if (stamp) {
+        const ageMs = Date.now() - new Date(stamp).getTime();
+        if (ageMs > 36*3600*1000) stale = true;  // >36h old
+        if (staleEl && stale) staleEl.textContent = "⚠ allocation data may be stale (last update " + stamp.slice(0,16).replace('T',' ') + " UTC)";
+      }
+      if (source === "fallback" && staleEl && !staleEl.textContent) {
+        staleEl.textContent = "⚠ showing static snapshot — live bot endpoint not reachable";
       }
       const mode = s.mode || "—";
       const modeEl = document.getElementById("core-mode");
