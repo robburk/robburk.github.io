@@ -85,6 +85,41 @@
     .stat-sub { font-size: 0.65rem; opacity: 0.4; margin-top: 0.25rem; }
     .up { color: #22c55e; } .down { color: #ef4444; } .dim { opacity: 0.35; }
 
+    /* ── Hybrid sections ── */
+    .hybrid-banner { display:flex; align-items:center; gap:1rem; padding:0.8rem 1.25rem;
+      border:1px solid currentColor; margin-bottom:2rem; font-size:0.72rem; letter-spacing:0.06em; }
+    .hybrid-dot { width:10px; height:10px; border-radius:50%; background:#22c55e; flex-shrink:0;
+      box-shadow:0 0 0 4px rgba(34,197,94,0.15); animation:pulse 2s infinite; }
+    .hybrid-state { font-family:var(--font-display); font-weight:700; letter-spacing:0.06em; }
+    .hybrid-meta { margin-left:auto; color:#ef4444; font-size:0.66rem; letter-spacing:0.08em; }
+    .core-wrap { border:2px solid #22c55e; margin-bottom:1.25rem; }
+    .core-main { padding:1.25rem 1.5rem; border-bottom:1px solid currentColor; }
+    .core-mode { font-family:var(--font-display); font-size:2.6rem; font-weight:700; line-height:1; margin:0.3rem 0; }
+    .core-reason { font-size:0.8rem; opacity:0.65; line-height:1.6; }
+    .core-grid { margin-bottom:0; border:0; border-top:0; }
+    .bt-card { border:1px solid currentColor; padding:1.1rem 1.4rem; margin-bottom:2.5rem; }
+    .bt-row { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; margin-top:0.8rem; }
+    .bt-cell { text-align:center; padding:0.6rem; border:1px solid currentColor; }
+    .bt-n { font-family:var(--font-display); font-size:1.5rem; font-weight:700; line-height:1; }
+    .bt-l { font-size:0.58rem; letter-spacing:0.08em; opacity:0.45; text-transform:uppercase; margin-top:0.35rem; }
+    .bt-note { font-size:0.68rem; opacity:0.5; margin-top:0.9rem; line-height:1.6; }
+    .exp-wrap { border:1px dashed #f59e0b; padding:1.1rem 1.4rem; margin-bottom:2.5rem; opacity:0.95; }
+    .exp-head { display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:1rem; }
+    .exp-pill { font-size:0.6rem; font-weight:600; letter-spacing:0.08em; padding:0.25rem 0.6rem;
+      border:1px solid #f59e0b; color:#f59e0b; }
+    .exp-pill.off { border-color:#ef4444; color:#ef4444; }
+    .exp-body { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+    .exp-val { font-size:0.82rem; margin-top:0.2rem; }
+    .exp-strat { display:flex; justify-content:space-between; align-items:center; font-size:0.76rem;
+      padding:0.4rem 0; border-bottom:1px dashed currentColor; }
+    .exp-tag { font-size:0.55rem; letter-spacing:0.06em; padding:0.1rem 0.5rem; border:1px solid currentColor; opacity:0.5; text-transform:uppercase; }
+    .exp-warn { font-size:0.66rem; color:#f59e0b; margin-top:1rem; line-height:1.6; opacity:0.85; }
+    .arch-wrap { border:1px solid currentColor; padding:0.4rem 1.4rem; margin-bottom:1.5rem; opacity:0.7; }
+    .arch-wrap summary { cursor:pointer; font-size:0.66rem; letter-spacing:0.1em; text-transform:uppercase; padding:0.7rem 0; opacity:0.7; }
+    .arch-item { font-size:0.72rem; padding:0.5rem 0; border-top:1px dashed currentColor; opacity:0.7; line-height:1.5; }
+    .arch-item b { opacity:0.9; }
+    @media(max-width:680px){ .exp-body{grid-template-columns:1fr;} .bt-row{grid-template-columns:repeat(2,1fr);} .hybrid-meta{display:none;} }
+
     .section-label { font-size: 0.62rem; font-weight: 500; letter-spacing: 0.12em; opacity: 0.5; text-transform: uppercase; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid currentColor; display: flex; align-items: center; justify-content: space-between; }
     .section-label .sublabel { opacity: 0.4; font-weight: 400; letter-spacing: 0.05em; }
 
@@ -209,6 +244,91 @@
       <div id="dashboard">
         <div class="bot-eyebrow">PRIVATE — AUTHORIZED</div>
         <h1 class="bot-title">TRADING<br>BOT.</h1>
+
+        <!-- ════════ HYBRID OVERVIEW ════════ -->
+        <div class="hybrid-banner">
+          <span class="hybrid-dot"></span>
+          <span class="hybrid-state">HYBRID MODE · CORE ALLOCATION + RESEARCH LANE</span>
+          <span class="hybrid-meta">LIVE TRADING DISABLED · PAPER / RECOMMENDATION ONLY</span>
+        </div>
+
+        <!-- ════════ ① CORE ALLOCATION ENGINE (primary) ════════ -->
+        <div class="section-label">① CORE ALLOCATION ENGINE
+          <span class="sublabel" id="core-asof">the working system · Candidate E</span></div>
+        <div class="core-wrap">
+          <div class="core-main">
+            <div class="stat-label">Current Mode</div>
+            <div class="core-mode" id="core-mode">—</div>
+            <div class="core-reason" id="core-reason">Loading allocation signal…</div>
+          </div>
+          <div class="stats-grid core-grid">
+            <div class="stat-box"><div class="stat-label">Target Asset</div><div class="stat-value" id="core-target">—</div></div>
+            <div class="stat-box"><div class="stat-label">Action</div><div class="stat-value" id="core-action" style="font-size:1rem;">—</div></div>
+            <div class="stat-box"><div class="stat-label">SPY Price</div><div class="stat-value" id="core-spy">—</div></div>
+            <div class="stat-box"><div class="stat-label">SPY 200-day</div><div class="stat-value" id="core-ma200">—</div></div>
+            <div class="stat-box"><div class="stat-label">SPY 50-day</div><div class="stat-value" id="core-ma50">—</div></div>
+            <div class="stat-box"><div class="stat-label">Crash Guard</div><div class="stat-value" id="core-crash" style="font-size:1.1rem;">—</div></div>
+            <div class="stat-box"><div class="stat-label">Last Check</div><div class="stat-value" id="core-last" style="font-size:1rem;">—</div></div>
+            <div class="stat-box"><div class="stat-label">Next Check</div><div class="stat-value" id="core-next" style="font-size:1rem;">—</div></div>
+          </div>
+        </div>
+        <div class="bt-card">
+          <div class="stat-label">BACKTEST — Candidate E · 33yr (1993–2026) · built to cut drawdowns, not maximize return</div>
+          <div class="bt-row">
+            <div class="bt-cell"><div class="bt-n up">10.1%</div><div class="bt-l">CAGR</div></div>
+            <div class="bt-cell"><div class="bt-n up">−20.6%</div><div class="bt-l">Max Drawdown</div></div>
+            <div class="bt-cell"><div class="bt-n">0.88</div><div class="bt-l">Sharpe</div></div>
+            <div class="bt-cell"><div class="bt-n">25</div><div class="bt-l">Switches (33y)</div></div>
+          </div>
+          <div class="bt-note">Rule: monthly — hold SPY if SPY&gt;200-day AND 50-day≥200-day, else SHY. &nbsp;vs SPY buy &amp; hold: 10.8% CAGR but −55% max drawdown.</div>
+        </div>
+
+        <!-- ════════ ② EXPERIMENTAL DAY-TRADING RESEARCH (secondary) ════════ -->
+        <div class="section-label">② EXPERIMENTAL DAY-TRADING RESEARCH
+          <span class="sublabel">sandbox · shadow only</span></div>
+        <div class="exp-wrap">
+          <div class="exp-head">
+            <span class="exp-pill">SHADOW ONLY</span>
+            <span class="exp-pill off">LIVE DISABLED</span>
+            <span class="exp-pill off">10% SIMULATED BUCKET</span>
+          </div>
+          <div class="exp-body">
+            <div>
+              <div class="stat-label">Research Universe</div>
+              <div class="exp-val">SPY · QQQ · IWM · SMH</div>
+              <div class="stat-label" style="margin-top:0.8rem;">Mode</div>
+              <div class="exp-val">Architecture reserved — engine not built yet</div>
+              <div class="stat-label" style="margin-top:0.8rem;">Strategy promoted?</div>
+              <div class="exp-val" style="color:#ef4444;">NONE</div>
+            </div>
+            <div>
+              <div class="stat-label">Strategies under research</div>
+              <div class="exp-strat">Opening range breakout <span class="exp-tag">research</span></div>
+              <div class="exp-strat">VWAP reclaim / rejection <span class="exp-tag">research</span></div>
+              <div class="exp-strat">Trend day continuation <span class="exp-tag">research</span></div>
+              <div class="exp-strat">Range-day mean reversion <span class="exp-tag">research</span></div>
+              <div class="exp-strat">Microstructure-lite (veto only) <span class="exp-tag">research</span></div>
+            </div>
+          </div>
+          <div class="exp-warn">⚠ Experimental only. Does not affect the core allocation engine. No live trading. No access to core allocation capital.</div>
+        </div>
+
+        <!-- ════════ ARCHIVED RESEARCH (collapsed) ════════ -->
+        <details class="arch-wrap">
+          <summary>ARCHIVED RESEARCH — 9 tested &amp; rejected strategies (not active)</summary>
+          <div class="arch-item"><b>Daily momentum (RSI/ATR scorer)</b> — REJECTED · negative out-of-sample after realistic execution</div>
+          <div class="arch-item"><b>FVG trigger</b> — REJECTED · diffuse failure, no predictive entry value</div>
+          <div class="arch-item"><b>Gap-and-hold continuation</b> — REJECTED · positive raw but negative tailwind-adjusted</div>
+          <div class="arch-item"><b>Breakout / trend-pullback</b> — REJECTED · worse than random entries on stocks</div>
+          <div class="arch-item"><b>Cross-sectional momentum</b> — REJECTED · lost to equal-weight, deeper drawdowns</div>
+          <div class="arch-item"><b>Short-term / residual reversal</b> — REJECTED · 2/6 walk-forward windows, overfit</div>
+          <div class="arch-item"><b>PEAD earnings drift</b> — REJECTED · did not beat random dates; post-2020 excess negative</div>
+          <div class="arch-item"><b>Setup-quality abstention model</b> — REJECTED · ML lost to a one-line regime filter</div>
+          <div class="arch-item"><b>Dual momentum allocation</b> — RESEARCH-ONLY · underperformed the simple monthly rule</div>
+        </details>
+
+        <div class="section-label" style="margin-top:1rem;">LEGACY BOT TELEMETRY
+          <span class="sublabel">heartbeat &amp; raw decision log (archived engine)</span></div>
 
         <div class="refresh-row">
           <div class="last-updated" id="last-updated">Loading...</div>
@@ -460,11 +580,11 @@
         renderLive(status);
         renderStats(status, log);
         renderWatchlist(live);
-        renderLastDecision(log.entries || []);
         renderToday(today);
         if (historical) renderHistorical(historical);
         if (memo) renderMemo(memo);
         if (perf) renderPerf(perf);
+        renderHybrid();
 
         document.getElementById("last-updated").textContent =
           "Refreshed " + new Date().toLocaleTimeString();
@@ -475,6 +595,47 @@
     }
 
     // ── Renderers ─────────────────────────────────────────────────
+
+    // Core Allocation Engine (Candidate E). Tries the API, falls back to a
+    // published core_status.json next to this page. Recommendation-only.
+    async function renderHybrid() {
+      let s = null;
+      try {
+        const r = await fetch(`${API}/api/core_allocation?token=${_token}`);
+        if (r.ok) s = await r.json();
+      } catch(e) {}
+      if (!s) {
+        try {
+          const r2 = await fetch(`core_status.json?t=${Date.now()}`);
+          if (r2.ok) s = await r2.json();
+        } catch(e) {}
+      }
+      const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+      if (!s || !s.data_ok) {
+        set("core-mode", "—");
+        set("core-reason", "Core allocation signal unavailable. Publish core_status.json next to this page, or add /api/core_allocation to the worker.");
+        return;
+      }
+      const mode = s.mode || "—";
+      const modeEl = document.getElementById("core-mode");
+      modeEl.textContent = mode;
+      modeEl.style.color = mode === "RISK_ON" ? "#22c55e" : "#3b82f6";
+      set("core-asof", "Candidate E · as of " + (s.last_data_date || (s.as_of||"").slice(0,10)));
+      set("core-reason", s.reason || "");
+      set("core-target", s.target_asset || "—");
+      set("core-action", (s.action || "—").replaceAll("_", " "));
+      set("core-spy", s.price != null ? "$" + s.price : "—");
+      set("core-ma200", s.ma_200 != null ? "$" + s.ma_200 : "—");
+      set("core-ma50", s.ma_50 != null ? "$" + s.ma_50 : "—");
+      const crashEl = document.getElementById("core-crash");
+      if (crashEl) {
+        crashEl.textContent = s.crash_guard_triggered ? "TRIGGERED" : "CLEAR";
+        crashEl.style.color = s.crash_guard_triggered ? "#ef4444" : "#22c55e";
+      }
+      set("core-last", s.last_monthly_check || "—");
+      set("core-next", s.next_monthly_check || "—");
+    }
+
     function setLive(cls, label, meta) {
       const banner = document.getElementById("live-banner");
       banner.className = "live-banner live-" + cls;

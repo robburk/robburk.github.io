@@ -1,0 +1,23 @@
+{
+  "engine": "core_allocation",
+  "as_of": "2026-05-21T15:39:21.590696+00:00",
+  "risk_asset": "SPY",
+  "defensive_asset": "SHY",
+  "execution_mode": "recommendation_only",
+  "data_ok": true,
+  "last_data_date": "2026-05-21",
+  "price": 738.81,
+  "ma_50": 694.79,
+  "ma_200": 675.64,
+  "above_200dma": true,
+  "ma50_ge_ma200": true,
+  "crash_guard_triggered": false,
+  "mode": "RISK_ON",
+  "target_asset": "SPY",
+  "reason": "SPY 738.81 is above its 200d MA (675.64) and 50d (694.79) >= 200d. Risk-on.",
+  "signal_frequency": "monthly",
+  "last_monthly_check": "2026-05-01",
+  "next_monthly_check": "2026-06-01",
+  "is_rebalance_day": false,
+  "action": "NO_ACTION_UNTIL_NEXT_CHECK"
+}
