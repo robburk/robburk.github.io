@@ -299,17 +299,24 @@
           <span class="sublabel" id="dt-asof">active shadow research · shadow only</span></div>
         <div class="exp-wrap">
           <div class="exp-head">
-            <span class="exp-pill" id="dt-mode">ACTIVE SHADOW RESEARCH</span>
-            <span class="exp-pill off">LIVE DISABLED</span>
-            <span class="exp-pill off">PAPER ORDERS DISABLED</span>
+            <span class="exp-pill" id="dt-mode">PAPER EXPERIMENTAL</span>
+            <span class="exp-pill off" id="dt-live">LIVE DISABLED</span>
+            <span class="exp-pill" id="dt-paperorders">PAPER ORDERS</span>
+            <span class="exp-pill off" id="dt-armed">NOT ARMED</span>
             <span class="exp-pill off">NO CORE CAPITAL</span>
           </div>
           <div class="exp-body">
             <div>
               <div class="stat-label">Broker</div>
               <div class="exp-val">Alpaca paper / sandbox</div>
-              <div class="stat-label" style="margin-top:0.7rem;">Research Universe</div>
-              <div class="exp-val">SPY · QQQ · IWM · SMH</div>
+              <div class="stat-label" style="margin-top:0.7rem;">Active paper strategy</div>
+              <div class="exp-val" id="dt-active">ORB 15m long-only</div>
+              <div class="stat-label" style="margin-top:0.7rem;">Risk caps</div>
+              <div class="exp-val" id="dt-caps">1 trade/day · 1 open · ≤$500 · stop required · EOD exit</div>
+              <div class="stat-label" style="margin-top:0.7rem;">Today</div>
+              <div class="exp-val"><span id="dt-trades-today">0</span> paper trades · <span id="dt-realized">0</span>R realized</div>
+              <div class="stat-label" style="margin-top:0.7rem;">Last paper order</div>
+              <div class="exp-val" id="dt-last-order">none yet</div>
               <div class="stat-label" style="margin-top:0.7rem;">Shadow setups logged</div>
               <div class="exp-val"><span id="dt-total">0</span> total · <span id="dt-today">0</span> today</div>
               <div class="stat-label" style="margin-top:0.7rem;">Strategy promoted?</div>
@@ -326,7 +333,7 @@
               </div>
             </div>
           </div>
-          <div class="exp-warn">⚠ Experimental only. Does not affect the core allocation engine. No live trading. No access to core allocation capital.</div>
+          <div class="exp-warn">⚠ PAPER EXPERIMENTAL ONLY. LIVE TRADING DISABLED. DOES NOT USE CORE ALLOCATION CAPITAL. Paper orders require explicit arming + a verified Alpaca paper account; until armed, the engine only logs the orders it would place.</div>
         </div>
 
         <!-- ════════ ARCHIVED RESEARCH (collapsed) ════════ -->
@@ -693,7 +700,22 @@
       }
       if (!d) return;
       const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-      set("dt-mode", (d.mode === "shadow_only" ? "ACTIVE SHADOW RESEARCH" : (d.mode||"OFF").toUpperCase()));
+      const p = d.paper || {};
+      const armed = p.paper_armed === true;
+      const liveOff = (p.live_trading_enabled === false) && (d.live_trading_enabled === false);
+      set("dt-mode", (d.mode === "paper_experimental") ? "PAPER EXPERIMENTAL" : (d.mode||"OFF").toUpperCase().replace("_"," "));
+      const liveEl = document.getElementById("dt-live");
+      if (liveEl) liveEl.textContent = liveOff ? "LIVE DISABLED" : "LIVE?!";
+      const poEl = document.getElementById("dt-paperorders");
+      if (poEl) { poEl.textContent = p.paper_orders_enabled ? "PAPER ORDERS ON" : "PAPER ORDERS OFF"; poEl.className = "exp-pill" + (p.paper_orders_enabled ? "" : " off"); }
+      const armedEl = document.getElementById("dt-armed");
+      if (armedEl) { armedEl.textContent = armed ? "ARMED" : "NOT ARMED"; armedEl.className = "exp-pill" + (armed ? "" : " off"); }
+      set("dt-active", (p.active_strategy || "ORB_15M_LONG_ONLY").replace(/_/g," "));
+      if (p.max_trades_per_day != null) set("dt-caps", `${p.max_trades_per_day} trade/day · ${p.max_open_positions} open · ≤$${p.max_notional_per_trade} · stop required · EOD exit`);
+      set("dt-trades-today", p.trades_today != null ? p.trades_today : 0);
+      set("dt-realized", p.today_realized_r != null ? p.today_realized_r : 0);
+      const lo = p.last_order;
+      set("dt-last-order", lo ? `${lo.symbol||""} ${lo.strategy||""} · ${lo.status||""}${lo.submitted? " (submitted "+(lo.order_id||"").slice(0,8)+")" : " (dry-run)"}` : "none yet");
       set("dt-total", d.setups_logged_total != null ? d.setups_logged_total : 0);
       set("dt-today", d.setups_logged_today != null ? d.setups_logged_today : 0);
       set("dt-promoted", d.any_promoted ? "see report" : "NONE");

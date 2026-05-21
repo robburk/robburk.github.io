@@ -1,9 +1,9 @@
 {
   "engine": "daytrading_research",
   "enabled": true,
-  "mode": "shadow_only",
+  "mode": "paper_experimental",
   "live_trading_enabled": false,
-  "paper_orders_enabled": false,
+  "paper_orders_enabled": true,
   "uses_core_capital": false,
   "broker": "Alpaca paper/sandbox",
   "universe": [
@@ -52,5 +52,22 @@
   },
   "best_strategy": "vwap_reclaim",
   "any_promoted": false,
-  "as_of": "2026-05-21T16:13:23.607168+00:00"
+  "paper": {
+    "mode": "paper_experimental",
+    "paper_orders_enabled": true,
+    "paper_armed": false,
+    "require_paper_account": true,
+    "live_trading_enabled": false,
+    "active_strategy": "ORB_15M_LONG_ONLY",
+    "max_trades_per_day": 1,
+    "max_open_positions": 1,
+    "max_notional_per_trade": 500,
+    "daily_loss_cap_r": -1.0,
+    "weekly_loss_cap_r": -3.0,
+    "open_positions": 0,
+    "trades_today": 0,
+    "today_realized_r": 0,
+    "last_order": null
+  },
+  "as_of": "2026-05-21T19:11:49.559418+00:00"
 }
