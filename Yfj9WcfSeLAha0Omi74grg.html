@@ -450,6 +450,8 @@
           <div class="dq-cell"><div class="dq-k">EOD exit status</div><div class="dq-v" id="po-eod">—</div></div>
           <div class="dq-cell"><div class="dq-k">Realized R today</div><div class="dq-v" id="po-realized">0</div></div>
           <div class="dq-cell"><div class="dq-k">Paper account</div><div class="dq-v" id="po-account">—</div></div>
+          <div class="dq-cell"><div class="dq-k">Paper equity</div><div class="dq-v" id="po-equity">—</div></div>
+          <div class="dq-cell"><div class="dq-k">Buying power</div><div class="dq-v" id="po-bp">—</div></div>
         </div>
         <a href="#overview" class="back-top">↑ Back to top</a>
 
@@ -1065,9 +1067,16 @@
       if (p.account_verified === true) {
         set("po-account", "VERIFIED");
         const ae = document.getElementById("po-account"); if (ae) ae.style.color = "#22c55e";
+        // account_detail is an object on success: {status, equity, buying_power, acct}
+        const ad = p.account_detail;
+        if (ad && typeof ad === "object") {
+          set("po-equity", ad.equity != null ? "$" + Number(ad.equity).toLocaleString() : "—");
+          set("po-bp", ad.buying_power != null ? "$" + Number(ad.buying_power).toLocaleString() : "—");
+        }
       } else if (p.account_verified === false) {
-        set("po-account", "NOT VERIFIED — " + (p.account_detail || "check keys"));
+        set("po-account", "NOT VERIFIED — " + (typeof p.account_detail === "string" ? p.account_detail : "check keys"));
         const ae = document.getElementById("po-account"); if (ae) ae.style.color = "#ef4444";
+        set("po-equity", "—"); set("po-bp", "—");
       } else {
         set("po-account", "—");
       }
