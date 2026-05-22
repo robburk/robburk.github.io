@@ -449,6 +449,7 @@
           <div class="dq-cell"><div class="dq-k">Last refusal</div><div class="dq-v" id="po-refusal">none</div></div>
           <div class="dq-cell"><div class="dq-k">EOD exit status</div><div class="dq-v" id="po-eod">—</div></div>
           <div class="dq-cell"><div class="dq-k">Realized R today</div><div class="dq-v" id="po-realized">0</div></div>
+          <div class="dq-cell"><div class="dq-k">Paper account</div><div class="dq-v" id="po-account">—</div></div>
         </div>
         <a href="#overview" class="back-top">↑ Back to top</a>
 
@@ -1060,6 +1061,16 @@
       set("po-refusal", (sc.last_refusal || p.last_refusal || "none"));
       set("po-eod", sc.eod_exit_status || "—");
       set("po-realized", p.today_realized_r != null ? p.today_realized_r : 0);
+      // paper account verification (shows whether the Alpaca keys authenticate)
+      if (p.account_verified === true) {
+        set("po-account", "VERIFIED");
+        const ae = document.getElementById("po-account"); if (ae) ae.style.color = "#22c55e";
+      } else if (p.account_verified === false) {
+        set("po-account", "NOT VERIFIED — " + (p.account_detail || "check keys"));
+        const ae = document.getElementById("po-account"); if (ae) ae.style.color = "#ef4444";
+      } else {
+        set("po-account", "—");
+      }
 
       // ── Daily report box ──
       const dr = d.daily_report;
