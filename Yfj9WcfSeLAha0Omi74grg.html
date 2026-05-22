@@ -396,6 +396,19 @@
         <div id="day-trading" class="anchor"></div>
         <div class="section-label">② EXPERIMENTAL DAY-TRADING RESEARCH · PAPER EXPERIMENTAL
           <span class="sublabel" id="dt-asof">active continuous research loop</span></div>
+        <!-- Day-trading progress console (live, mirrors the top overview) -->
+        <div class="console-bar" id="dt-console">
+          <div class="console-cell"><div class="console-k">Paper Equity</div><div class="console-v" id="dtc-equity">—</div></div>
+          <div class="console-cell"><div class="console-k">Buying Power</div><div class="console-v muted" id="dtc-bp">—</div></div>
+          <div class="console-cell"><div class="console-k">Account</div><div class="console-v" id="dtc-account">—</div></div>
+          <div class="console-cell"><div class="console-k">Scanner</div><div class="console-v muted" id="dtc-scanner" style="font-size:0.7rem;">—</div></div>
+          <div class="console-cell"><div class="console-k">Open Position</div><div class="console-v muted" id="dtc-open">none</div></div>
+          <div class="console-cell"><div class="console-k">Trades Today</div><div class="console-v muted" id="dtc-trades">0 / 1</div></div>
+          <div class="console-cell"><div class="console-k">Realized R</div><div class="console-v muted" id="dtc-realized">0</div></div>
+          <div class="console-cell"><div class="console-k">Shadow Setups</div><div class="console-v muted" id="dtc-shadow">0</div></div>
+          <div class="console-cell"><div class="console-k">Armed</div><div class="console-v muted" id="dtc-armed">—</div></div>
+          <div class="console-cell"><div class="console-k">Last Order</div><div class="console-v muted" id="dtc-last" style="font-size:0.7rem;">none yet</div></div>
+        </div>
         <div class="exp-wrap">
           <div class="exp-head">
             <span class="exp-pill" id="dt-mode">PAPER EXPERIMENTAL</span>
@@ -1080,6 +1093,34 @@
       } else {
         set("po-account", "—");
       }
+
+      // ── Day-trading progress console (mirrors top overview) ──
+      const ad2 = (p.account_verified === true && p.account_detail && typeof p.account_detail === "object") ? p.account_detail : null;
+      const dtcEq = document.getElementById("dtc-equity");
+      if (dtcEq) {
+        if (ad2 && ad2.equity != null) { dtcEq.textContent = "$" + Number(ad2.equity).toLocaleString(); dtcEq.className = "console-v ok"; }
+        else { dtcEq.textContent = "—"; dtcEq.className = "console-v muted"; }
+      }
+      set("dtc-bp", ad2 && ad2.buying_power != null ? "$" + Number(ad2.buying_power).toLocaleString() : "—");
+      const dtcAcct = document.getElementById("dtc-account");
+      if (dtcAcct) {
+        if (p.account_verified === true) { dtcAcct.textContent = "VERIFIED"; dtcAcct.className = "console-v ok"; }
+        else if (p.account_verified === false) { dtcAcct.textContent = "NOT VERIFIED"; dtcAcct.className = "console-v err"; }
+        else { dtcAcct.textContent = "—"; dtcAcct.className = "console-v muted"; }
+      }
+      set("dtc-scanner", (sc.scanner_status || "—").replace(/_/g," "));
+      set("dtc-open", (p.open_positions && p.open_positions > 0) ? (p.open_positions + " open") : "none");
+      set("dtc-trades", (p.trades_today != null ? p.trades_today : 0) + " / " + (p.max_trades_per_day != null ? p.max_trades_per_day : 1));
+      const dtcR = document.getElementById("dtc-realized");
+      if (dtcR) {
+        const rv = p.today_realized_r != null ? p.today_realized_r : 0;
+        dtcR.textContent = (rv > 0 ? "+" : "") + rv + "R";
+        dtcR.className = "console-v " + (rv > 0 ? "ok" : rv < 0 ? "err" : "muted");
+      }
+      set("dtc-shadow", (d.setups_logged_total != null ? d.setups_logged_total : 0));
+      const dtcArmed = document.getElementById("dtc-armed");
+      if (dtcArmed) { dtcArmed.textContent = armed ? "YES" : "NO"; dtcArmed.className = "console-v " + (armed ? "warn" : "muted"); }
+      set("dtc-last", lo ? ((lo.symbol||"") + " · " + (lo.status||"") + (lo.submitted ? " (submitted)" : " (dry-run)")) : "none yet");
 
       // ── Daily report box ──
       const dr = d.daily_report;
