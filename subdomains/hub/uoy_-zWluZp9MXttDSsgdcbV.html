@@ -456,9 +456,10 @@ function renderControl(d){
     ['Kill switch available', sg.kill_switch_available === true],
   ];
   let html = chips.map(c => `<span class="safechip ${c[1]?'ok':'bad'}">${c[1]?'\u2713':'\u2717'} ${c[0]}</span>`).join('');
-  if(sg.max_daily_trades != null) html += `<span class="safechip neutral">Max daily trades: ${sg.max_daily_trades}</span>`;
   if(sg.crypto_bucket_usd != null) html += `<span class="safechip neutral">Paper bucket: $${sg.crypto_bucket_usd}</span>`;
   if(sg.max_notional_per_coin != null) html += `<span class="safechip neutral">Cap/coin: $${sg.max_notional_per_coin}</span>`;
+  if(sg.max_coins_held != null) html += `<span class="safechip neutral">Max coins held: ${sg.max_coins_held}</span>`;
+  if(sg.rebalance_cadence != null) html += `<span class="safechip neutral">Rebalance: ${sg.rebalance_cadence}</span>`;
   $('laneSafe').innerHTML = html;
   const upd = d.updated_at ? new Date(d.updated_at).toLocaleString('en-US', {dateStyle:'medium', timeStyle:'short'}) : '\u2014';
   $('laneNote').innerHTML = 'Last change: <b>' + (d.last_event || '\u2014') + '</b> at ' + upd +
